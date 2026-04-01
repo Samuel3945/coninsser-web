@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portafolio — CONINSSER</title>
+  <meta name="description" content="Portafolio de proyectos ejecutados por CONINSSER en Cartagena: vías en concreto, cubiertas metálicas y construcción residencial.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo-img">
+      <img src="img/coninsser_logo_01.jpg" alt="CONINSSER">
+    </a>
+    <ul class="nav__links">
+      <li><a href="servicios.html">Servicios</a></li>
+      <li><a href="portafolio.html" class="active">Portafolio</a></li>
+      <li><a href="nosotros.html">Nosotros</a></li>
+      <li class="nav__mobile-cta"><a href="contacto.html" class="btn btn--navy btn--sm">Solicitar Cotización</a></li>
+    </ul>
+    <a href="contacto.html" class="btn btn--navy btn--sm nav__cta-btn">Solicitar Cotización</a>
+    <button class="nav__hamburger" onclick="toggleMobileMenu()" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══ PAGE HEADER ══ -->
+<header class="page-header">
+  <div class="container">
+    <span class="label">Proyectos ejecutados</span>
+    <h1 class="title title--xl">Portafolio<br>de Obra</h1>
+    <p class="subtitle" style="margin-top:16px">
+      Cada proyecto representa el compromiso de CONINSSER con la calidad técnica
+      y la entrega a tiempo. Estos son algunos de los trabajos que hemos realizado
+      para nuestros clientes en la región Caribe.
+    </p>
+  </div>
+</header>
+
+
+<!-- ══ PROYECTOS DESTACADOS ══ -->
+<section class="section">
+  <div class="container">
+
+    <div style="margin-bottom:64px" class="reveal">
+      <span class="label">Proyectos destacados</span>
+      <h2 class="title">Trabajos Realizados</h2>
+      <p class="subtitle" style="margin-top:12px">Descripción de los principales proyectos ejecutados por CONINSSER.</p>
+    </div>
+
+    <!-- Proyecto 1: Construcción de vías -->
+    <div class="project-block reveal">
+      <div class="project-block__img">
+        <img src="img/coninsser_via_01.jpg" alt="Construcción de vía en concreto hidráulico — CONINSSER">
+      </div>
+      <div>
+        <span class="project-block__client">Desco SAS — A3 Internacional</span>
+        <h2 class="project-block__title">Construcción de Vías en Concreto Hidráulico</h2>
+        <p class="project-block__desc">
+          Ejecución de vías en concreto hidráulico para zonas industriales y residenciales en
+          Cartagena de Indias. El trabajo incluyó excavación, subbase granular compactada,
+          encofrado y vaciado de losas de concreto de 3.000 PSI con juntas de dilatación
+          debidamente selladas.
+        </p>
+        <p class="project-block__desc">
+          Las vías cumplen con los estándares técnicos de diseño estructural para soportar
+          carga vehicular pesada, garantizando una vida útil superior a 20 años con
+          mantenimiento mínimo.
+        </p>
+        <div class="project-block__tags">
+          <span class="p-tag">Construcción Civil</span>
+          <span class="p-tag">Vías en Concreto</span>
+          <span class="p-tag">Obras Industriales</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proyecto 2: Cubierta metálica industrial -->
+    <div class="project-block project-block--rev reveal">
+      <div class="project-block__img">
+        <img src="img/coninsser_techo_01.jpg" alt="Cubierta metálica industrial — Taller La Sierra">
+      </div>
+      <div>
+        <span class="project-block__client">Taller Industrial La Sierra</span>
+        <h2 class="project-block__title">Cubierta Metálica para Taller Industrial</h2>
+        <p class="project-block__desc">
+          Diseño, fabricación e instalación de cubierta metálica sobre estructura existente
+          del Taller Industrial La Sierra. Se instalaron perlines metálicos, correas y
+          lámina de zinc-alum calibre 26 con translúcidos para iluminación natural.
+        </p>
+        <p class="project-block__desc">
+          El proyecto incluyó el sellado perimetral, instalación de canales recolectoras
+          de aguas lluvias y bajantes. La obra se ejecutó sin interrumpir las operaciones
+          del taller, trabajando en horarios acordados con el cliente.
+        </p>
+        <div class="project-block__tags">
+          <span class="p-tag">Cubiertas Metálicas</span>
+          <span class="p-tag">Estructuras en Acero</span>
+          <span class="p-tag">Industrial</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proyecto 3: Conjunto Residencial Burano -->
+    <div class="project-block reveal">
+      <div class="project-block__img">
+        <img src="img/coninsser_construccion_01.jpg" alt="Conjunto Residencial Burano — CONINSSER">
+      </div>
+      <div>
+        <span class="project-block__client">Conjunto Residencial Burano</span>
+        <h2 class="project-block__title">Obras Civiles e Instalaciones Técnicas</h2>
+        <p class="project-block__desc">
+          Ejecución de obras civiles complementarias y redes técnicas para el
+          Conjunto Residencial Burano. Los trabajos abarcaron la construcción de vías
+          internas en concreto, andenes peatonales, zonas comunes y la instalación
+          de redes hidráulico-sanitarias exteriores.
+        </p>
+        <p class="project-block__desc">
+          Adicionalmente se instalaron las acometidas eléctricas y redes de gas natural
+          para las unidades residenciales, cumpliendo con toda la normativa técnica
+          vigente para proyectos de vivienda en Colombia.
+        </p>
+        <div class="project-block__tags">
+          <span class="p-tag">Construcción Civil</span>
+          <span class="p-tag">Redes Hidráulicas</span>
+          <span class="p-tag">Instalaciones Eléctricas</span>
+          <span class="p-tag">Gas Natural</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proyecto 4: Zinnia Club House -->
+    <div class="project-block project-block--rev reveal">
+      <div class="project-block__img">
+        <img src="img/coninsser_construccion_02.jpg" alt="Zinnia Club House P.H. — CONINSSER">
+      </div>
+      <div>
+        <span class="project-block__client">Zinnia Club House P.H.</span>
+        <h2 class="project-block__title">Adecuación y Construcción Club House — Penthouse</h2>
+        <p class="project-block__desc">
+          Construcción y adecuación integral de las zonas comunes del Club House y
+          Penthouse de Zinnia. La obra comprendió actividades de obra blanca, acabados
+          en pisos y muros, cielos rasos, instalación de redes eléctricas y sistema
+          de iluminación especializado.
+        </p>
+        <p class="project-block__desc">
+          Se realizaron también obras de impermeabilización en terrazas y la instalación
+          de sistemas hidrosanitarios para las áreas sociales. El proyecto se entregó
+          con acabados de alta especificación acorde a las exigencias del cliente.
+        </p>
+        <div class="project-block__tags">
+          <span class="p-tag">Obra Civil</span>
+          <span class="p-tag">Acabados</span>
+          <span class="p-tag">Instalaciones Técnicas</span>
+          <span class="p-tag">Impermeabilización</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="index.html" class="footer__logo">CONINSSER</a>
+        <p>Construcciones, Instalaciones y Servicios SAS. Líderes en ingeniería y construcción en la Costa Caribe colombiana.</p>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Empresa</p>
+        <a href="index.html">Inicio</a>
+        <a href="servicios.html">Servicios</a>
+        <a href="portafolio.html">Portafolio</a>
+        <a href="nosotros.html">Nosotros</a>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Servicios</p>
+        <a href="servicios.html#construccion">Construcción e Infraestructura</a>
+        <a href="servicios.html#instalaciones">Instalaciones Técnicas</a>
+        <a href="servicios.html#energia-solar">Energía Solar</a>
+        <a href="servicios.html#mantenimiento">Mantenimiento Integral</a>
+        <a href="servicios.html#asesoria">Asesoría Jurídica</a>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Contacto</p>
+        <p>
+          Barrio Altos de San Isidro MZ L 2<br>
+          Cartagena de Indias, Colombia<br><br>
+          311 428 6021 · 312 235 4601<br>
+          301 249 4181<br><br>
+          NIT: 90187641-0
+        </p>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 CONINSSER — Construcciones, Instalaciones y Servicios SAS.</span>
+      <span>NIT 90187641-0 · Cartagena de Indias</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ FLOATING WHATSAPP ══ -->
+<a href="https://wa.me/573045485364?text=Hola%2C%20me%20interesa%20un%20presupuesto."
+   target="_blank" class="wa-float" aria-label="Contactar por WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+</a>
+
+<!-- ══ LIGHTBOX ══ -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+  <button class="lightbox__close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox__content" onclick="event.stopPropagation()">
+    <img id="lb-img" src="" alt="">
+    <div class="lightbox__caption">
+      <span id="lb-cat"></span>
+      <h3 id="lb-title"></h3>
+    </div>
+  </div>
+  <button class="lightbox__nav lightbox__nav--prev" onclick="event.stopPropagation(); changeLightbox(-1)">&#8249;</button>
+  <button class="lightbox__nav lightbox__nav--next" onclick="event.stopPropagation(); changeLightbox(1)">&#8250;</button>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

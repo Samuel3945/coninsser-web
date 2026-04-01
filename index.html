@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONINSSER — Construcciones, Instalaciones y Servicios SAS</title>
+  <meta name="description" content="Empresa líder en construcción civil, instalaciones técnicas, energía solar y mantenimiento en Cartagena, Colombia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo-img">
+      <img src="img/coninsser_logo_01.jpg" alt="CONINSSER">
+    </a>
+    <ul class="nav__links">
+      <li><a href="servicios.html">Servicios</a></li>
+      <li><a href="portafolio.html">Portafolio</a></li>
+      <li><a href="nosotros.html">Nosotros</a></li>
+      <li class="nav__mobile-cta"><a href="contacto.html" class="btn btn--navy btn--sm">Solicitar Cotización</a></li>
+    </ul>
+    <a href="contacto.html" class="btn btn--navy btn--sm nav__cta-btn">Solicitar Cotización</a>
+    <button class="nav__hamburger" onclick="toggleMobileMenu()" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero__text">
+    <span class="hero__eyebrow">Cartagena de Indias, Colombia</span>
+    <h1 class="hero__title">
+      Construimos espacios que <em>impulsan</em> el crecimiento
+    </h1>
+    <p class="hero__sub">
+      Soluciones profesionales en construcción civil, instalaciones técnicas
+      y energía solar. Más de 15 años respaldan nuestro trabajo en la Costa Caribe.
+    </p>
+    <div class="hero__actions">
+      <a href="contacto.html" class="btn btn--navy btn--lg">Solicitar Cotización</a>
+      <a href="portafolio.html" class="btn btn--outline btn--lg">Ver Portafolio</a>
+    </div>
+  </div>
+  <div class="hero__image">
+    <img src="img/coninsser_hero.jpg" alt="CONINSSER — Proyectos en Cartagena">
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<div class="stats">
+  <div class="stats__grid">
+    <div class="stat reveal">
+      <div class="stat__num">15+</div>
+      <div class="stat__lbl">Años de experiencia</div>
+    </div>
+    <div class="stat reveal reveal-d1">
+      <div class="stat__num">50+</div>
+      <div class="stat__lbl">Proyectos ejecutados</div>
+    </div>
+    <div class="stat reveal reveal-d2">
+      <div class="stat__num">100%</div>
+      <div class="stat__lbl">Respaldo técnico</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SERVICIOS ══ -->
+<section class="section" id="servicios">
+  <div class="container">
+    <div class="services__header reveal">
+      <div>
+        <span class="label">Nuestros servicios</span>
+        <h2 class="title">Soluciones Integrales<br>para su Proyecto</h2>
+      </div>
+      <a href="servicios.html" class="link-all">Ver todos los servicios →</a>
+    </div>
+    <div class="services__grid services__grid--5">
+
+      <div class="svc-card svc-card--img reveal reveal-d1">
+        <div class="svc-card__img">
+          <img src="img/coninsser_via_01.jpg" alt="Construcción e Infraestructura CONINSSER">
+        </div>
+        <div class="svc-card__num">01</div>
+        <h3>Construcción e Infraestructura</h3>
+        <p>Viviendas, obras civiles, estructuras, movimiento de tierras y remodelaciones.</p>
+        <a href="servicios.html#construccion" class="svc-card__link">Ver más →</a>
+      </div>
+
+      <div class="svc-card svc-card--img reveal reveal-d2">
+        <div class="svc-card__img">
+          <img src="img/coninsser_construccion_02.jpg" alt="Instalaciones Técnicas CONINSSER">
+        </div>
+        <div class="svc-card__num">02</div>
+        <h3>Instalaciones Técnicas</h3>
+        <p>Redes hidráulicas, gas, eléctricas, CCTV, cableado estructurado y energía regulada.</p>
+        <a href="servicios.html#instalaciones" class="svc-card__link">Ver más →</a>
+      </div>
+
+      <div class="svc-card svc-card--img reveal reveal-d3">
+        <div class="svc-card__img">
+          <img src="img/coninsser_techo_01.jpg" alt="Energía Solar CONINSSER">
+        </div>
+        <div class="svc-card__num">03</div>
+        <h3>Energía Solar</h3>
+        <p>Diseño e instalación de sistemas fotovoltaicos on-grid y off-grid con baterías.</p>
+        <a href="servicios.html#energia-solar" class="svc-card__link">Ver más →</a>
+      </div>
+
+      <div class="svc-card svc-card--img reveal reveal-d4">
+        <div class="svc-card__img">
+          <img src="img/coninsser_techo_03.jpg" alt="Mantenimiento Integral CONINSSER">
+        </div>
+        <div class="svc-card__num">04</div>
+        <h3>Mantenimiento Integral</h3>
+        <p>Mantenimiento eléctrico, hidráulico, sanitario y locativo preventivo y correctivo.</p>
+        <a href="servicios.html#mantenimiento" class="svc-card__link">Ver más →</a>
+      </div>
+
+      <div class="svc-card svc-card--img reveal reveal-d5">
+        <div class="svc-card__img">
+          <img src="img/coninsser_construccion_04.jpg" alt="Asesoría Jurídica CONINSSER">
+        </div>
+        <div class="svc-card__num">05</div>
+        <h3>Asesoría Jurídica</h3>
+        <p>Trámites legales, licencias de construcción y permisos ante entidades competentes.</p>
+        <a href="servicios.html#asesoria" class="svc-card__link">Ver más →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ METODOLOGÍA ══ -->
+<section class="section section--gray" id="metodologia">
+  <div class="container">
+    <div class="methodology__header reveal">
+      <span class="label">Cómo trabajamos</span>
+      <h2 class="title">Nuestro Proceso de Trabajo</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal reveal-d1">
+        <div class="step__num">01</div>
+        <h3>Diagnóstico Técnico</h3>
+        <p>Visitamos su proyecto, evaluamos las condiciones del terreno y definimos el alcance técnico con precisión.</p>
+      </div>
+      <div class="step reveal reveal-d2">
+        <div class="step__num">02</div>
+        <h3>Cotización Formal</h3>
+        <p>Elaboramos una propuesta detallada con especificaciones técnicas, materiales, plazos y costos sin letra pequeña.</p>
+      </div>
+      <div class="step reveal reveal-d3">
+        <div class="step__num">03</div>
+        <h3>Ejecución Profesional</h3>
+        <p>Nuestro equipo calificado ejecuta la obra con los más altos estándares de calidad y seguridad industrial.</p>
+      </div>
+      <div class="step reveal reveal-d4">
+        <div class="step__num">04</div>
+        <h3>Entrega y Garantía</h3>
+        <p>Entregamos la obra con documentación completa, verificación técnica y respaldo de garantía post-entrega.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PORTAFOLIO (preview) ══ -->
+<section class="section" id="portafolio">
+  <div class="container">
+    <div class="portfolio__header reveal">
+      <div>
+        <span class="label">Trabajos realizados</span>
+        <h2 class="title">Portafolio de Obra</h2>
+      </div>
+      <a href="portafolio.html" class="link-all">Ver portafolio completo →</a>
+    </div>
+    <div class="portfolio__grid reveal">
+
+      <div class="p-card"
+           data-img="img/coninsser_via_01.jpg"
+           data-title="Vías en Concreto Hidráulico"
+           data-cat="Desco SAS"
+           onclick="openLightbox(this)">
+        <div class="p-card__label">
+          <span>Desco SAS</span>
+          <h4>Vías en Concreto Hidráulico</h4>
+        </div>
+        <img src="img/coninsser_via_01.jpg" alt="Vías en concreto — Desco SAS">
+        <div class="p-card__hover">
+          <div class="p-card__zoom">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-card"
+           data-img="img/coninsser_techo_01.jpg"
+           data-title="Cubierta Metálica Industrial"
+           data-cat="Taller Industrial La Sierra"
+           onclick="openLightbox(this)">
+        <div class="p-card__label">
+          <span>Taller Industrial La Sierra</span>
+          <h4>Cubierta Metálica Industrial</h4>
+        </div>
+        <img src="img/coninsser_techo_01.jpg" alt="Cubierta metálica — Taller Industrial La Sierra">
+        <div class="p-card__hover">
+          <div class="p-card__zoom">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-card"
+           data-img="img/coninsser_construccion_01.jpg"
+           data-title="Obras Civiles e Instalaciones"
+           data-cat="Conjunto Residencial Burano"
+           onclick="openLightbox(this)">
+        <div class="p-card__label">
+          <span>Conjunto Residencial Burano</span>
+          <h4>Obras Civiles e Instalaciones</h4>
+        </div>
+        <img src="img/coninsser_construccion_01.jpg" alt="Obras civiles — Conjunto Residencial Burano">
+        <div class="p-card__hover">
+          <div class="p-card__zoom">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-card"
+           data-img="img/coninsser_via_02.jpg"
+           data-title="Vías en Concreto Hidráulico"
+           data-cat="A3 Internacional"
+           onclick="openLightbox(this)">
+        <div class="p-card__label">
+          <span>A3 Internacional</span>
+          <h4>Vías en Concreto Hidráulico</h4>
+        </div>
+        <img src="img/coninsser_via_02.jpg" alt="Vías en concreto — A3 Internacional">
+        <div class="p-card__hover">
+          <div class="p-card__zoom">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-card"
+           data-img="img/coninsser_techo_02.jpg"
+           data-title="Cubierta Metálica Industrial"
+           data-cat="IMI"
+           onclick="openLightbox(this)">
+        <div class="p-card__label">
+          <span>IMI</span>
+          <h4>Cubierta Metálica Industrial</h4>
+        </div>
+        <img src="img/coninsser_techo_02.jpg" alt="Cubierta metálica — IMI">
+        <div class="p-card__hover">
+          <div class="p-card__zoom">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-card"
+           data-img="img/coninsser_techo_03.jpg"
+           data-title="Adecuación Club House P.H."
+           data-cat="Zinnia Club House P.H."
+           onclick="openLightbox(this)">
+        <div class="p-card__label">
+          <span>Zinnia Club House P.H.</span>
+          <h4>Adecuación Club House P.H.</h4>
+        </div>
+        <img src="img/coninsser_techo_03.jpg" alt="Adecuación Club House — Zinnia">
+        <div class="p-card__hover">
+          <div class="p-card__zoom">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="section section--navy cta reveal">
+  <div class="container">
+    <span class="label label--white">¿Tiene un proyecto?</span>
+    <h2 class="title title--white" style="margin-bottom:16px">Hablemos de su<br>próxima obra</h2>
+    <p class="subtitle subtitle--white" style="margin-inline:auto; margin-bottom:40px">
+      Contáctenos hoy y reciba una cotización formal sin costo. Cubrimos toda la región Caribe.
+    </p>
+    <div class="cta__actions">
+      <a href="contacto.html" class="btn btn--outline-white btn--lg">Solicitar Cotización</a>
+      <a href="https://wa.me/573045485364?text=Hola%2C%20me%20interesa%20un%20presupuesto." target="_blank" class="btn btn--whatsapp btn--lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="index.html" class="footer__logo">CONINSSER</a>
+        <p>Construcciones, Instalaciones y Servicios SAS. Líderes en ingeniería y construcción en la Costa Caribe colombiana con más de 15 años de experiencia.</p>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Empresa</p>
+        <a href="index.html">Inicio</a>
+        <a href="servicios.html">Servicios</a>
+        <a href="portafolio.html">Portafolio</a>
+        <a href="nosotros.html">Nosotros</a>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Servicios</p>
+        <a href="servicios.html#construccion">Construcción e Infraestructura</a>
+        <a href="servicios.html#instalaciones">Instalaciones Técnicas</a>
+        <a href="servicios.html#energia-solar">Energía Solar</a>
+        <a href="servicios.html#mantenimiento">Mantenimiento Integral</a>
+        <a href="servicios.html#asesoria">Asesoría Jurídica</a>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Contacto</p>
+        <p>
+          Barrio Altos de San Isidro MZ L 2<br>
+          Cartagena de Indias, Colombia<br><br>
+          311 428 6021 · 312 235 4601<br>
+          301 249 4181<br><br>
+          NIT: 90187641-0
+        </p>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 CONINSSER — Construcciones, Instalaciones y Servicios SAS.</span>
+      <span>NIT 90187641-0 · Cartagena de Indias</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ FLOATING WHATSAPP ══ -->
+<a href="https://wa.me/573045485364?text=Hola%2C%20me%20interesa%20un%20presupuesto."
+   target="_blank" class="wa-float" aria-label="Contactar por WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+</a>
+
+<!-- ══ LIGHTBOX ══ -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+  <button class="lightbox__close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox__content" onclick="event.stopPropagation()">
+    <img id="lb-img" src="" alt="">
+    <div class="lightbox__caption">
+      <span id="lb-cat"></span>
+      <h3 id="lb-title"></h3>
+    </div>
+  </div>
+  <button class="lightbox__nav lightbox__nav--prev" onclick="event.stopPropagation(); changeLightbox(-1)">&#8249;</button>
+  <button class="lightbox__nav lightbox__nav--next" onclick="event.stopPropagation(); changeLightbox(1)">&#8250;</button>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
