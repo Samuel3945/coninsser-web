@@ -349,6 +349,9 @@
 
     .img-preview-wrap {
       margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     #img-preview {
@@ -360,6 +363,41 @@
       border: 1px solid var(--gris);
       margin-top: 6px;
     }
+
+    .existing-img-item {
+      position: relative;
+      display: inline-block;
+    }
+
+    .existing-img-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 1px solid var(--gris);
+      display: block;
+    }
+
+    .existing-img-item button {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(198,40,40,0.85);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      cursor: pointer;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .existing-img-item button:hover { background: var(--rojo); }
 
     .form-error {
       background: #ffebee;
@@ -569,11 +607,10 @@
             <input type="text" id="f-categoria" placeholder="Ej: Construcción, Herramientas..." />
           </div>
           <div class="form-group full">
-            <label for="f-imagen">Imagen</label>
-            <input type="file" id="f-imagen" accept="image/*" onchange="previewImage(event)" />
-            <div class="img-preview-wrap">
-              <img id="img-preview" alt="Vista previa" />
-            </div>
+            <label for="f-imagen">Imágenes</label>
+            <div id="existing-images" class="img-preview-wrap" style="margin-bottom:6px;"></div>
+            <input type="file" id="f-imagen" accept="image/*" multiple onchange="previewNewImages(event)" />
+            <div id="new-img-previews" class="img-preview-wrap"></div>
           </div>
           <div class="form-group full">
             <div class="checkbox-group">
@@ -755,8 +792,10 @@
     const page = filteredProducts.slice(start, start + PAGE_SIZE);
 
     tbody.innerHTML = page.map(p => {
-      const imgUrl = p.imagen
-        ? `${BASE}/api/files/${COLLECTION}/${p.id}/${p.imagen}`
+      const imagenes = Array.isArray(p.imagen) ? p.imagen : (p.imagen ? [p.imagen] : []);
+      const firstImg = imagenes[0];
+      const imgUrl = firstImg
+        ? `${BASE}/api/files/${COLLECTION}/${p.id}/${firstImg}`
         : null;
 
       const imgHtml = imgUrl
@@ -840,16 +879,22 @@
     document.getElementById('modal-title').textContent = 'Nuevo producto';
     document.getElementById('edit-id').value = '';
     document.getElementById('product-form').reset();
-    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('existing-images').innerHTML = '';
+    document.getElementById('new-img-previews').innerHTML = '';
     document.getElementById('f-activo').checked = true;
     document.getElementById('form-error').style.display = 'none';
     document.getElementById('save-btn').textContent = 'Guardar producto';
     openModal();
   }
 
+  // Tracks which existing images the user wants to delete (filenames)
+  let imagesToDelete = [];
+
   function openEdit(id) {
     const p = allProducts.find(x => x.id === id);
     if (!p) return;
+
+    imagesToDelete = [];
 
     document.getElementById('modal-title').textContent = 'Editar producto';
     document.getElementById('edit-id').value = p.id;
@@ -863,19 +908,30 @@
     document.getElementById('form-error').style.display = 'none';
     document.getElementById('save-btn').textContent = 'Guardar cambios';
 
-    // Preview existing image
-    const preview = document.getElementById('img-preview');
-    if (p.imagen) {
-      preview.src = `${BASE}/api/files/${COLLECTION}/${p.id}/${p.imagen}`;
-      preview.style.display = 'block';
-    } else {
-      preview.style.display = 'none';
-    }
+    // Show existing images with individual delete buttons
+    const imagenes = Array.isArray(p.imagen) ? p.imagen : (p.imagen ? [p.imagen] : []);
+    const existingWrap = document.getElementById('existing-images');
+    existingWrap.innerHTML = '';
+    imagenes.forEach(filename => {
+      const url = `${BASE}/api/files/${COLLECTION}/${p.id}/${filename}`;
+      const item = document.createElement('div');
+      item.className = 'existing-img-item';
+      item.dataset.filename = filename;
+      item.innerHTML = `
+        <img src="${url}" alt="${escHtml(filename)}" />
+        <button type="button" title="Eliminar imagen" onclick="markImageForDelete(this, '${escHtml(filename)}')">&#x2715;</button>`;
+      existingWrap.appendChild(item);
+    });
 
-    // Clear file input
+    document.getElementById('new-img-previews').innerHTML = '';
     document.getElementById('f-imagen').value = '';
 
     openModal();
+  }
+
+  function markImageForDelete(btn, filename) {
+    imagesToDelete.push(filename);
+    btn.closest('.existing-img-item').remove();
   }
 
   function openModal() {
@@ -887,21 +943,24 @@
     document.getElementById('modal-overlay').classList.remove('open');
     document.getElementById('product-form').reset();
     document.getElementById('edit-id').value = '';
-    const preview = document.getElementById('img-preview');
-    preview.src = '';
-    preview.style.display = 'none';
+    document.getElementById('existing-images').innerHTML = '';
+    document.getElementById('new-img-previews').innerHTML = '';
     document.getElementById('form-error').style.display = 'none';
+    imagesToDelete = [];
   }
 
-  function previewImage(event) {
-    const file = event.target.files[0];
-    const preview = document.getElementById('img-preview');
-    if (file) {
-      preview.src = URL.createObjectURL(file);
-      preview.style.display = 'block';
-    } else {
-      preview.style.display = 'none';
-    }
+  function previewNewImages(event) {
+    const wrap = document.getElementById('new-img-previews');
+    wrap.innerHTML = '';
+    Array.from(event.target.files).forEach(file => {
+      const item = document.createElement('div');
+      item.className = 'existing-img-item';
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = file.name;
+      item.appendChild(img);
+      wrap.appendChild(item);
+    });
   }
 
   async function saveProduct() {
@@ -930,9 +989,10 @@
       formData.append('activo', document.getElementById('f-activo').checked);
 
       const fileInput = document.getElementById('f-imagen');
-      if (fileInput.files[0]) {
-        formData.append('imagen', fileInput.files[0]);
-      }
+      Array.from(fileInput.files).forEach(file => formData.append('imagen', file));
+
+      // Tell PocketBase to remove the images marked for deletion
+      imagesToDelete.forEach(filename => formData.append('imagen-', filename));
 
       const url = id
         ? `${BASE}/api/collections/${COLLECTION}/records/${id}`
