@@ -494,6 +494,127 @@
 
     .page-info { font-size: 0.85rem; color: var(--gris-texto); }
 
+    /* ======== MODAL CATEGORÍAS ======== */
+    #cat-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 250;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #cat-overlay.open { display: flex; }
+
+    .cat-modal {
+      background: var(--blanco);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    .cat-modal .modal-header { border-radius: 8px 8px 0 0; }
+
+    .cat-modal-body { padding: 18px 18px 8px; }
+
+    .cat-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 40px;
+      margin-bottom: 16px;
+    }
+
+    .cat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #e8eaf6;
+      border: 1px solid #c5cae9;
+      color: var(--azul);
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .cat-chip .chip-del {
+      background: none;
+      border: none;
+      color: var(--rojo);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0 2px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .cat-chip .chip-del:hover { color: #b71c1c; }
+
+    .cat-add-form {
+      border-top: 1px solid var(--gris);
+      padding: 14px 0 6px;
+    }
+
+    .cat-add-form label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--azul);
+      margin-bottom: 8px;
+    }
+
+    .cat-add-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .cat-add-row .cat-input-icono {
+      width: 68px;
+      flex-shrink: 0;
+      padding: 8px 8px;
+      border: 1px solid var(--gris);
+      border-radius: 5px;
+      font-size: 1.1rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .cat-add-row .cat-input-nombre {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid var(--gris);
+      border-radius: 5px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .cat-add-row input:focus { border-color: var(--azul-hover); }
+
+    .cat-add-row .btn-add-cat {
+      background: var(--azul);
+      color: var(--blanco);
+      border: none;
+      border-radius: 5px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .cat-add-row .btn-add-cat:hover { background: var(--azul-hover); }
+    .cat-add-row .btn-add-cat:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .cat-empty { color: var(--gris-texto); font-size: 0.85rem; font-style: italic; }
+
+    .btn-cat { background: #e8eaf6; color: var(--azul); border: 1px solid #c5cae9; }
+    .btn-cat:hover { background: #c5cae9; }
+
     @media (max-width: 600px) {
       main { padding: 16px 12px; }
       .form-grid { grid-template-columns: 1fr; }
@@ -540,6 +661,7 @@
             <option value="false">Inactivos</option>
           </select>
         </div>
+        <button class="btn btn-cat" onclick="openCatModal()">🏷️ Categorías</button>
         <button class="btn btn-add" onclick="openCreate()">+ Nuevo producto</button>
       </div>
     </div>
@@ -604,7 +726,9 @@
           </div>
           <div class="form-group">
             <label for="f-categoria">Categoría</label>
-            <input type="text" id="f-categoria" placeholder="Ej: Construcción, Herramientas..." />
+            <select id="f-categoria">
+              <option value="">Sin categoría</option>
+            </select>
           </div>
           <div class="form-group full">
             <label for="f-imagen">Imágenes</label>
@@ -628,6 +752,29 @@
   </div>
 </div>
 
+<!-- ======== MODAL CATEGORÍAS ======== -->
+<div id="cat-overlay">
+  <div class="cat-modal">
+    <div class="modal-header">
+      <h3>🏷️ Gestión de Categorías</h3>
+      <button class="modal-close" onclick="closeCatModal()">&#x2715;</button>
+    </div>
+    <div class="cat-modal-body">
+      <div id="cat-chips" class="cat-chips">
+        <span class="cat-empty">Cargando...</span>
+      </div>
+      <div class="cat-add-form">
+        <label>Nueva categoría</label>
+        <div class="cat-add-row">
+          <input type="text" class="cat-input-icono" id="cat-icono" placeholder="🧱" maxlength="4" />
+          <input type="text" class="cat-input-nombre" id="cat-nombre" placeholder="Nombre de la categoría" />
+          <button class="btn-add-cat" id="cat-add-btn" onclick="addCategory()">Agregar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ======== CONFIRM DELETE ======== -->
 <div id="confirm-overlay">
   <div class="confirm-box">
@@ -647,9 +794,11 @@
 <script>
   const BASE = 'https://conniser-pocketbase.kmy1zc.easypanel.host';
   const COLLECTION = 'productos';
+  const CAT_COLLECTION = 'categorias';
 
   let authToken = null;
   let allProducts = [];
+  let allCategories = [];
   let filteredProducts = [];
   let currentPage = 1;
   const PAGE_SIZE = 15;
@@ -717,7 +866,49 @@
   function showApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-    loadProducts();
+    loadCategories().then(() => loadProducts());
+  }
+
+  // ======== CATEGORIES ========
+
+  async function loadCategories() {
+    try {
+      const token = localStorage.getItem('pb_admin_token');
+      const res = await fetch(
+        `${BASE}/api/collections/${CAT_COLLECTION}/records?perPage=200&sort=nombre`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      allCategories = data.items || [];
+      populateCategorySelects();
+    } catch (e) { /* silencioso, no bloquea carga de productos */ }
+  }
+
+  function populateCategorySelects() {
+    // Filter sidebar select (uses ID as value)
+    const filterSel = document.getElementById('filter-cat');
+    const filterVal = filterSel.value;
+    filterSel.innerHTML = '<option value="">Todas las categorías</option>';
+    allCategories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = (c.icono ? c.icono + ' ' : '') + c.nombre;
+      if (c.id === filterVal) opt.selected = true;
+      filterSel.appendChild(opt);
+    });
+
+    // Form select
+    const formSel = document.getElementById('f-categoria');
+    const formVal = formSel.value;
+    formSel.innerHTML = '<option value="">Sin categoría</option>';
+    allCategories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = (c.icono ? c.icono + ' ' : '') + c.nombre;
+      if (c.id === formVal) opt.selected = true;
+      formSel.appendChild(opt);
+    });
   }
 
   // ======== PRODUCTS ========
@@ -728,7 +919,7 @@
       const token = localStorage.getItem('pb_admin_token');
       console.log('Token antes de cargar productos:', token);
       const res = await fetch(
-        `${BASE}/api/collections/${COLLECTION}/records?perPage=500`,
+        `${BASE}/api/collections/${COLLECTION}/records?expand=categoria&perPage=500`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -737,25 +928,10 @@
 
       const data = await res.json();
       allProducts = data.items || [];
-      populateCategoryFilter();
       applyFilters();
     } catch (err) {
       setTableState('error', err.message);
     }
-  }
-
-  function populateCategoryFilter() {
-    const cats = [...new Set(allProducts.map(p => p.categoria).filter(Boolean))].sort();
-    const sel = document.getElementById('filter-cat');
-    const current = sel.value;
-    sel.innerHTML = '<option value="">Todas las categorías</option>';
-    cats.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c;
-      opt.textContent = c;
-      if (c === current) opt.selected = true;
-      sel.appendChild(opt);
-    });
   }
 
   function applyFilters() {
@@ -806,7 +982,7 @@
         <tr>
           <td>${imgHtml}</td>
           <td><strong>${escHtml(p.nombre)}</strong></td>
-          <td>${escHtml(p.categoria || '—')}</td>
+          <td>${escHtml((p.expand && p.expand.categoria && p.expand.categoria.nombre) || '—')}</td>
           <td>${formatCOP(p.precio_normal)}</td>
           <td>${formatCOP(p.precio_mayoreo)}</td>
           <td>${p.stock != null ? p.stock : '—'}</td>
@@ -884,6 +1060,8 @@
     document.getElementById('f-activo').checked = true;
     document.getElementById('form-error').style.display = 'none';
     document.getElementById('save-btn').textContent = 'Guardar producto';
+    populateCategorySelects();
+    document.getElementById('f-categoria').value = '';
     openModal();
   }
 
@@ -907,6 +1085,8 @@
     document.getElementById('f-activo').checked = !!p.activo;
     document.getElementById('form-error').style.display = 'none';
     document.getElementById('save-btn').textContent = 'Guardar cambios';
+    populateCategorySelects();
+    document.getElementById('f-categoria').value = p.categoria || '';
 
     // Show existing images with individual delete buttons
     const imagenes = Array.isArray(p.imagen) ? p.imagen : (p.imagen ? [p.imagen] : []);
@@ -985,7 +1165,7 @@
       formData.append('precio_normal', parseFloat(precio_normal) || 0);
       formData.append('precio_mayoreo', parseFloat(document.getElementById('f-precio-mayoreo').value) || 0);
       formData.append('stock', parseInt(document.getElementById('f-stock').value) || 0);
-      formData.append('categoria', document.getElementById('f-categoria').value.trim());
+      formData.append('categoria', document.getElementById('f-categoria').value);
       formData.append('activo', document.getElementById('f-activo').checked);
 
       const fileInput = document.getElementById('f-imagen');
@@ -1060,6 +1240,91 @@
     }
   }
 
+  // ======== CATEGORY MODAL ========
+
+  function openCatModal() {
+    document.getElementById('cat-overlay').classList.add('open');
+    renderCategoryChips();
+    document.getElementById('cat-nombre').focus();
+  }
+
+  function closeCatModal() {
+    document.getElementById('cat-overlay').classList.remove('open');
+    document.getElementById('cat-nombre').value = '';
+    document.getElementById('cat-icono').value = '';
+  }
+
+  function renderCategoryChips() {
+    const wrap = document.getElementById('cat-chips');
+    if (allCategories.length === 0) {
+      wrap.innerHTML = '<span class="cat-empty">Aún no hay categorías.</span>';
+      return;
+    }
+    wrap.innerHTML = allCategories.map(c => `
+      <span class="cat-chip">
+        ${c.icono ? escHtml(c.icono) + ' ' : ''}${escHtml(c.nombre)}
+        <button class="chip-del" onclick="deleteCategory('${c.id}', '${escHtml(c.nombre)}')" title="Eliminar">&#x2715;</button>
+      </span>`).join('');
+  }
+
+  async function addCategory() {
+    const nombre = document.getElementById('cat-nombre').value.trim();
+    const icono = document.getElementById('cat-icono').value.trim();
+    if (!nombre) { document.getElementById('cat-nombre').focus(); return; }
+
+    const btn = document.getElementById('cat-add-btn');
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    try {
+      const token = localStorage.getItem('pb_admin_token');
+      const res = await fetch(`${BASE}/api/collections/${CAT_COLLECTION}/records`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ nombre, icono })
+      });
+      if (res.status === 401) { doLogout(); return; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al crear categoría.');
+
+      allCategories.push(data);
+      allCategories.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      document.getElementById('cat-nombre').value = '';
+      document.getElementById('cat-icono').value = '';
+      renderCategoryChips();
+      populateCategorySelects();
+      showToast('Categoría creada.', 'success');
+    } catch (err) {
+      showToast(err.message || 'Error al crear.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Agregar';
+    }
+  }
+
+  async function deleteCategory(id, name) {
+    if (!confirm(`¿Eliminar la categoría "${name}"?`)) return;
+    try {
+      const token = localStorage.getItem('pb_admin_token');
+      const res = await fetch(`${BASE}/api/collections/${CAT_COLLECTION}/records/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.status === 401) { doLogout(); return; }
+      if (!res.ok) throw new Error('Error al eliminar categoría.');
+
+      allCategories = allCategories.filter(c => c.id !== id);
+      renderCategoryChips();
+      populateCategorySelects();
+      showToast('Categoría eliminada.', 'success');
+    } catch (err) {
+      showToast(err.message || 'Error al eliminar.', 'error');
+    }
+  }
+
   // ======== HELPERS ========
 
   function formatCOP(val) {
@@ -1089,11 +1354,12 @@
     toastTimer = setTimeout(() => { el.className = ''; }, 3500);
   }
 
-  // Keyboard: Escape closes modal/confirm
+  // Keyboard: Escape closes modal/confirm/cat
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       closeModal();
       closeConfirm();
+      closeCatModal();
     }
   });
 
@@ -1104,6 +1370,14 @@
 
   document.getElementById('confirm-overlay').addEventListener('click', function(e) {
     if (e.target === this) closeConfirm();
+  });
+
+  document.getElementById('cat-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCatModal();
+  });
+
+  document.getElementById('cat-nombre').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addCategory();
   });
 
   // Enter key on login
