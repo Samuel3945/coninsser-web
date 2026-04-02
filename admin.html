@@ -883,6 +883,12 @@
 
   function closeModal() {
     document.getElementById('modal-overlay').classList.remove('open');
+    document.getElementById('product-form').reset();
+    document.getElementById('edit-id').value = '';
+    const preview = document.getElementById('img-preview');
+    preview.src = '';
+    preview.style.display = 'none';
+    document.getElementById('form-error').style.display = 'none';
   }
 
   function previewImage(event) {
@@ -941,9 +947,10 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Error al guardar.');
 
-      closeModal();
-      showToast(id ? 'Producto actualizado correctamente.' : 'Producto creado correctamente.', 'success');
+      const successMsg = id ? 'Producto actualizado correctamente.' : 'Producto creado correctamente.';
       await loadProducts();
+      closeModal();
+      showToast(successMsg, 'success');
     } catch (err) {
       showFormError(err.message || 'Error al guardar el producto.');
     } finally {
