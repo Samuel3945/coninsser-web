@@ -738,6 +738,10 @@
       <h2>Productos</h2>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <div class="filters">
+          <label id="select-all-wrap">
+            <input type="checkbox" id="select-all-cb" onchange="toggleSelectAll(this.checked)" />
+            Seleccionar todos
+          </label>
           <input type="text" id="search-input" placeholder="Buscar por nombre..." oninput="applyFilters()" />
           <select id="filter-cat" onchange="applyFilters()">
             <option value="">Todas las categorías</option>
@@ -757,6 +761,7 @@
       <table id="products-table">
         <thead>
           <tr>
+            <th style="width:36px;text-align:center;padding:12px 8px;"></th>
             <th>Imagen</th>
             <th>Nombre</th>
             <th>Categoría</th>
@@ -875,6 +880,16 @@
   </div>
 </div>
 
+<!-- ======== BULK ACTION BAR ======== -->
+<div id="bulk-bar">
+  <span id="bulk-count">0 productos seleccionados</span>
+  <select id="bulk-cat-select">
+    <option value="">Mover a categoría...</option>
+  </select>
+  <button id="bulk-apply-btn" class="btn-bulk-apply" onclick="applyBulkMove()">Aplicar</button>
+  <button class="btn-bulk-cancel" onclick="cancelSelection()">Cancelar selección</button>
+</div>
+
 <!-- ======== TOAST ======== -->
 <div id="toast"></div>
 
@@ -889,6 +904,7 @@
   let filteredProducts = [];
   let currentPage = 1;
   const PAGE_SIZE = 15;
+  let selectedIds = new Set();
 
   // ======== AUTH ========
 
@@ -996,6 +1012,18 @@
       if (c.id === formVal) opt.selected = true;
       formSel.appendChild(opt);
     });
+
+    // Bulk bar select
+    const bulkSel = document.getElementById('bulk-cat-select');
+    if (bulkSel) {
+      bulkSel.innerHTML = '<option value="">Mover a categoría...</option>';
+      allCategories.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = (c.icono ? c.icono + ' ' : '') + c.nombre;
+        bulkSel.appendChild(opt);
+      });
+    }
   }
 
   // ======== PRODUCTS ========
@@ -1065,8 +1093,10 @@
         ? `<img class="img-thumb" src="${imgUrl}" alt="${escHtml(p.nombre)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'img-placeholder\\'>📦</div>'" />`
         : `<div class="img-placeholder">📦</div>`;
 
+      const isSelected = selectedIds.has(p.id);
       return `
         <tr>
+          <td style="text-align:center;"><input type="checkbox" class="cb-select" ${isSelected ? 'checked' : ''} onchange="toggleSelect('${p.id}', this.checked)" /></td>
           <td>${imgHtml}</td>
           <td><strong>${escHtml(p.nombre)}</strong></td>
           <td>${escHtml((p.expand && p.expand.categoria && p.expand.categoria.nombre) || '—')}</td>
@@ -1088,6 +1118,7 @@
     }).join('');
 
     renderPagination();
+    updateSelectAllState();
   }
 
   function renderPagination() {
@@ -1409,6 +1440,106 @@
       showToast('Categoría eliminada.', 'success');
     } catch (err) {
       showToast(err.message || 'Error al eliminar.', 'error');
+    }
+  }
+
+  // ======== BULK SELECTION ========
+
+  function toggleSelect(id, checked) {
+    if (checked) selectedIds.add(id);
+    else selectedIds.delete(id);
+    updateSelectAllState();
+    updateBulkBar();
+  }
+
+  function toggleSelectAll(checked) {
+    if (checked) {
+      filteredProducts.forEach(p => selectedIds.add(p.id));
+    } else {
+      filteredProducts.forEach(p => selectedIds.delete(p.id));
+    }
+    renderTable();
+    updateBulkBar();
+  }
+
+  function updateSelectAllState() {
+    const cb = document.getElementById('select-all-cb');
+    if (!cb) return;
+    const totalFiltered = filteredProducts.length;
+    const selectedInFiltered = filteredProducts.filter(p => selectedIds.has(p.id)).length;
+    if (selectedInFiltered === 0) {
+      cb.checked = false;
+      cb.indeterminate = false;
+    } else if (selectedInFiltered === totalFiltered) {
+      cb.checked = true;
+      cb.indeterminate = false;
+    } else {
+      cb.checked = false;
+      cb.indeterminate = true;
+    }
+  }
+
+  function updateBulkBar() {
+    const bar = document.getElementById('bulk-bar');
+    const count = selectedIds.size;
+    if (count > 0) {
+      bar.classList.add('visible');
+      document.getElementById('bulk-count').textContent =
+        `${count} producto${count !== 1 ? 's' : ''} seleccionado${count !== 1 ? 's' : ''}`;
+    } else {
+      bar.classList.remove('visible');
+    }
+  }
+
+  function cancelSelection() {
+    selectedIds.clear();
+    renderTable();
+    updateBulkBar();
+  }
+
+  async function applyBulkMove() {
+    const catId = document.getElementById('bulk-cat-select').value;
+    if (!catId) {
+      showToast('Selecciona una categoría destino.', 'error');
+      return;
+    }
+
+    const ids = Array.from(selectedIds);
+    const applyBtn = document.getElementById('bulk-apply-btn');
+    applyBtn.disabled = true;
+    applyBtn.textContent = 'Aplicando...';
+
+    try {
+      const token = localStorage.getItem('pb_admin_token');
+      let errors = 0;
+
+      await Promise.all(ids.map(async id => {
+        try {
+          const res = await fetch(`${BASE}/api/collections/${COLLECTION}/records/${id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ categoria: catId })
+          });
+          if (!res.ok) errors++;
+        } catch { errors++; }
+      }));
+
+      const updated = ids.length - errors;
+      selectedIds.clear();
+      await loadProducts();
+      updateBulkBar();
+
+      if (errors === 0) {
+        showToast(`${updated} producto${updated !== 1 ? 's' : ''} actualizados correctamente.`, 'success');
+      } else {
+        showToast(`${updated} actualizados, ${errors} con error.`, 'error');
+      }
+    } finally {
+      applyBtn.disabled = false;
+      applyBtn.textContent = 'Aplicar';
     }
   }
 
