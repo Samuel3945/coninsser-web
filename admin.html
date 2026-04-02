@@ -688,9 +688,11 @@
   async function loadProducts() {
     setTableState('loading');
     try {
+      const token = localStorage.getItem('pb_admin_token');
+      console.log('Token antes de cargar productos:', token);
       const res = await fetch(
-        `${BASE}/api/collections/${COLLECTION}/records?perPage=500&sort=-created`,
-        { headers: { Authorization: `Bearer ${authToken}` } }
+        `${BASE}/api/collections/${COLLECTION}/records?perPage=500`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.status === 401) { doLogout(); return; }
