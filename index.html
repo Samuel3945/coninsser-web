@@ -329,8 +329,27 @@
       </div>
 
       <!-- Categorías destacadas -->
-      <div class="prod-cats" id="home-cats">
-        <!-- cargadas por JS -->
+      <div class="prod-cats">
+        <a href="productos.html" class="home-cat-card">
+          <img src="img/coninsser_construccion_01.jpg" alt="Construcción" loading="lazy">
+          <div class="home-cat-card__overlay"></div>
+          <span class="home-cat-card__name">Construcción</span>
+        </a>
+        <a href="productos.html" class="home-cat-card">
+          <img src="img/coninsser_techo_01.jpg" alt="Cubiertas y Techos" loading="lazy">
+          <div class="home-cat-card__overlay"></div>
+          <span class="home-cat-card__name">Cubiertas y Techos</span>
+        </a>
+        <a href="productos.html" class="home-cat-card">
+          <img src="img/coninsser_via_01.jpg" alt="Vías y Pavimentos" loading="lazy">
+          <div class="home-cat-card__overlay"></div>
+          <span class="home-cat-card__name">Vías y Pavimentos</span>
+        </a>
+        <a href="productos.html" class="home-cat-card">
+          <img src="img/coninsser_construccion_04.jpg" alt="Instalaciones Técnicas" loading="lazy">
+          <div class="home-cat-card__overlay"></div>
+          <span class="home-cat-card__name">Instalaciones Técnicas</span>
+        </a>
       </div>
 
     </div>
@@ -439,38 +458,6 @@
   }
 </style>
 
-<script>
-(function() {
-  const PB = 'https://conniser-pocketbase.kmy1zc.easypanel.host';
-  fetch(`${PB}/api/collections/categorias/records?perPage=4&sort=created`)
-    .then(r => r.json())
-    .then(data => {
-      const cats = data.items || data.data || [];
-      const wrap = document.getElementById('home-cats');
-      if (!wrap) return;
-      wrap.innerHTML = cats.map(cat => {
-        const imgArr = Array.isArray(cat.img) ? cat.img : (cat.img ? [cat.img] : []);
-        const hasImg = imgArr.length > 0;
-        const imgSrc = hasImg ? `${PB}/api/files/categorias/${cat.id}/${imgArr[0]}` : null;
-        if (hasImg) {
-          return `<a href="productos.html" class="home-cat-card">
-            <img src="${imgSrc}" alt="${cat.nombre}" loading="lazy">
-            <div class="home-cat-card__overlay"></div>
-            <span class="home-cat-card__name">${cat.nombre}</span>
-          </a>`;
-        } else {
-          return `<a href="productos.html" class="home-cat-card home-cat-card--placeholder">
-            <span class="home-cat-card__placeholder-name">${cat.nombre}</span>
-          </a>`;
-        }
-      }).join('');
-    })
-    .catch(() => {
-      const wrap = document.getElementById('home-cats');
-      if (wrap) wrap.style.display = 'none';
-    });
-})();
-</script>
 
 <!-- ══ CTA ══ -->
 <section class="section section--navy cta reveal">
