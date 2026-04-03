@@ -736,6 +736,92 @@
       .form-grid .full { grid-column: 1; }
       header { padding: 0 16px; }
     }
+
+    /* ══ TABS ══ */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 2px solid var(--surface-low);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      padding: 12px 28px;
+      font-family: var(--font-b);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); }
+
+    /* ══ PORTFOLIO MODAL OVERLAY ══ */
+    #pf-modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0, 6, 102, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 200;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+    #pf-modal-overlay.open { display: flex; }
+
+    /* ══ PORTFOLIO CARD PREVIEW ══ */
+    .pf-preview { margin-top: 24px; border-top: 1.5px solid rgba(198,197,212,0.3); padding-top: 20px; }
+    .pf-preview-label {
+      font-size: 0.69rem; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 14px;
+    }
+    .pf-card-preview {
+      border-radius: 2px; overflow: hidden;
+      background: var(--surface-card);
+      box-shadow: 0 2px 16px rgba(0,6,102,0.08);
+      max-width: 300px;
+    }
+    .pf-card-preview__img {
+      height: 155px;
+      background: var(--surface-low);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; color: var(--text-muted);
+      overflow: hidden; position: relative;
+    }
+    .pf-card-preview__img img {
+      width: 100%; height: 100%; object-fit: cover;
+      position: absolute; inset: 0;
+    }
+    .pf-card-preview__body { padding: 14px 16px; }
+    .pf-card-preview__type {
+      font-size: 0.67rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--secondary); margin-bottom: 4px;
+    }
+    .pf-card-preview__title {
+      font-family: var(--font-h); font-size: 1rem; font-weight: 700;
+      color: var(--primary); margin-bottom: 3px; line-height: 1.2;
+    }
+    .pf-card-preview__client { font-size: 0.77rem; color: var(--text-muted); margin-bottom: 8px; }
+    .pf-card-preview__desc {
+      font-size: 0.81rem; color: var(--text); line-height: 1.5; margin-bottom: 10px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .pf-card-preview__footer { display: flex; align-items: center; justify-content: space-between; }
+    .pf-card-preview__ver-mas {
+      font-size: 0.73rem; font-weight: 600; color: var(--secondary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .pf-card-preview__destacado {
+      font-size: 0.67rem; background: #FEF9C3; color: #854D0E;
+      padding: 2px 8px; border-radius: 2px; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -757,11 +843,17 @@
 <!-- ======== APP ======== -->
 <div id="app">
   <header>
-    <div class="brand">CONINSSER <span>Admin de Productos</span></div>
+    <div class="brand">CONINSSER <span>Panel de Administración</span></div>
     <button class="btn btn-logout" onclick="doLogout()">Cerrar sesión</button>
   </header>
 
   <main>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="productos" onclick="switchTab('productos')">Productos</button>
+      <button class="tab-btn" data-tab="portafolio" onclick="switchTab('portafolio')">Portafolio</button>
+    </div>
+
+    <div id="section-productos">
     <div class="top-bar">
       <h2>Productos</h2>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -809,6 +901,66 @@
     </div>
 
     <div class="pagination" id="pagination"></div>
+    </div><!-- /section-productos -->
+
+    <!-- ══ SECCIÓN PORTAFOLIO ══ -->
+    <div id="section-portafolio" style="display:none">
+      <div class="top-bar">
+        <h2>Portafolio</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div class="filters">
+            <input type="text" id="pf-search" placeholder="Buscar por título o cliente..." oninput="applyPortfolioFilters()" />
+            <select id="pf-filter-tipo" onchange="applyPortfolioFilters()">
+              <option value="">Todos los tipos</option>
+              <option>Construcción</option>
+              <option>Instalación Eléctrica</option>
+              <option>Instalación Hidráulica</option>
+              <option>Gas</option>
+              <option>Energía Solar</option>
+              <option>CCTV</option>
+              <option>Mantenimiento</option>
+              <option>Movimiento de Tierras</option>
+              <option>Otro</option>
+            </select>
+            <select id="pf-filter-activo" onchange="applyPortfolioFilters()">
+              <option value="">Todos</option>
+              <option value="true">Activos</option>
+              <option value="false">Inactivos</option>
+            </select>
+            <select id="pf-filter-destacado" onchange="applyPortfolioFilters()">
+              <option value="">Destacados: todos</option>
+              <option value="true">Solo destacados</option>
+              <option value="false">No destacados</option>
+            </select>
+          </div>
+          <button class="btn btn-add" onclick="openPortfolioCreate()">+ Nuevo proyecto</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="pf-table" style="display:none">
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Título</th>
+              <th>Cliente</th>
+              <th>Tipo de trabajo</th>
+              <th>Fecha entrega</th>
+              <th style="text-align:center;">Destacado</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="pf-table-body"></tbody>
+        </table>
+        <div id="pf-table-state" class="state-msg" style="display:none">
+          <div class="spinner"></div>
+          <p>Cargando proyectos...</p>
+        </div>
+      </div>
+
+      <div class="pagination" id="pf-pagination"></div>
+    </div><!-- /section-portafolio -->
   </main>
 </div>
 
@@ -886,6 +1038,112 @@
     <div class="modal-footer">
       <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-add" id="save-btn" onclick="saveProduct()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL PORTAFOLIO ══ -->
+<div id="pf-modal-overlay">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <h3 id="pf-modal-title">Nuevo proyecto</h3>
+      <button class="modal-close" onclick="closePfModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-error" id="pf-form-error"></div>
+      <form id="pf-form" onsubmit="return false;">
+        <input type="hidden" id="pf-edit-id" />
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="pf-titulo">Título del proyecto *</label>
+            <input type="text" id="pf-titulo" placeholder="Ej: Instalación eléctrica edificio Bocagrande" oninput="updatePfPreview()" required />
+          </div>
+          <div class="form-group">
+            <label for="pf-cliente">Cliente</label>
+            <input type="text" id="pf-cliente" placeholder="Nombre del cliente o empresa" oninput="updatePfPreview()" />
+          </div>
+          <div class="form-group">
+            <label for="pf-ubicacion">Ubicación</label>
+            <input type="text" id="pf-ubicacion" placeholder="Ej: Manga, Cartagena" />
+          </div>
+          <div class="form-group">
+            <label for="pf-fecha">Fecha de entrega</label>
+            <input type="date" id="pf-fecha" />
+          </div>
+          <div class="form-group">
+            <label for="pf-tipo">Tipo de trabajo</label>
+            <select id="pf-tipo" onchange="updatePfPreview()">
+              <option value="">Seleccionar...</option>
+              <option>Construcción</option>
+              <option>Instalación Eléctrica</option>
+              <option>Instalación Hidráulica</option>
+              <option>Gas</option>
+              <option>Energía Solar</option>
+              <option>CCTV</option>
+              <option>Mantenimiento</option>
+              <option>Movimiento de Tierras</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label for="pf-desc-corta">Descripción corta * <span id="pf-desc-count" style="font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">(0/200)</span></label>
+            <textarea id="pf-desc-corta" placeholder="Resumen visible en la tarjeta del sitio web" maxlength="200" oninput="updatePfDescCount()" style="min-height:60px;"></textarea>
+          </div>
+          <div class="form-group full">
+            <label for="pf-desc-completa">Descripción completa</label>
+            <textarea id="pf-desc-completa" placeholder="Descripción detallada del proyecto (para el modal del sitio web)" style="min-height:90px;"></textarea>
+          </div>
+          <div class="form-group full">
+            <label for="pf-resena">Reseña del cliente</label>
+            <textarea id="pf-resena" placeholder="Testimonio u opinión del cliente sobre el trabajo realizado" style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group full">
+            <label for="pf-contacto">Nombre del contacto del cliente</label>
+            <input type="text" id="pf-contacto" placeholder="Ej: Ing. Pedro Gómez" />
+          </div>
+          <div class="form-group full">
+            <label for="pf-imagenes">Imágenes del proyecto</label>
+            <div id="pf-existing-images" class="img-preview-wrap" style="margin-bottom:6px;"></div>
+            <input type="file" id="pf-imagenes" accept="image/*" multiple onchange="previewPfImages(event)" />
+            <div id="pf-new-previews" class="img-preview-wrap"></div>
+          </div>
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="pf-destacado" onchange="updatePfPreview()" />
+              <label for="pf-destacado">Proyecto destacado (aparece primero en el sitio)</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="pf-activo" checked />
+              <label for="pf-activo">Proyecto activo (visible en el sitio)</label>
+            </div>
+          </div>
+          <!-- Vista previa -->
+          <div class="form-group full">
+            <div class="pf-preview">
+              <p class="pf-preview-label">Vista previa de tarjeta</p>
+              <div class="pf-card-preview">
+                <div class="pf-card-preview__img" id="pf-preview-img">🏗️</div>
+                <div class="pf-card-preview__body">
+                  <p class="pf-card-preview__type" id="pf-preview-tipo">Tipo de trabajo</p>
+                  <p class="pf-card-preview__title" id="pf-preview-titulo">Título del proyecto</p>
+                  <p class="pf-card-preview__client" id="pf-preview-cliente">Cliente</p>
+                  <p class="pf-card-preview__desc" id="pf-preview-desc">Descripción corta del proyecto...</p>
+                  <div class="pf-card-preview__footer">
+                    <span class="pf-card-preview__ver-mas">Ver más →</span>
+                    <span class="pf-card-preview__destacado" id="pf-preview-destacado" style="display:none;">⭐ Destacado</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closePfModal()">Cancelar</button>
+      <button class="btn btn-add" id="pf-save-btn" onclick="savePortfolio()">Guardar proyecto</button>
     </div>
   </div>
 </div>
@@ -1682,13 +1940,18 @@
     toastTimer = setTimeout(() => { el.className = ''; }, 3500);
   }
 
-  // Keyboard: Escape closes modal/confirm/cat
+  // Keyboard: Escape closes modal/confirm/cat/portfolio
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       closeModal();
       closeConfirm();
       closeCatModal();
+      closePfModal();
     }
+  });
+
+  document.getElementById('pf-modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePfModal();
   });
 
   // Click outside modal closes it
@@ -1712,6 +1975,371 @@
   document.getElementById('password').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
   });
+
+  // ======== TABS ========
+
+  let portfolioLoaded = false;
+
+  function switchTab(tab) {
+    document.getElementById('section-productos').style.display  = tab === 'productos'  ? 'block' : 'none';
+    document.getElementById('section-portafolio').style.display = tab === 'portafolio' ? 'block' : 'none';
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    if (tab === 'portafolio' && !portfolioLoaded) {
+      portfolioLoaded = true;
+      loadPortfolio();
+    }
+  }
+
+  // ======== PORTAFOLIO ========
+
+  const PF_BUCKET = 'portafolio-imagenes';
+  let allPortfolio       = [];
+  let filteredPortfolio  = [];
+  let pfCurrentPage      = 1;
+  const PF_PAGE_SIZE     = 10;
+  let pfImagesToDelete   = [];
+
+  async function loadPortfolio() {
+    setPfTableState('loading');
+    try {
+      const { data, error } = await supabaseClient
+        .from('portafolio')
+        .select('*')
+        .order('destacado', { ascending: false })
+        .order('created_at', { ascending: false });
+      if (error) throw new Error('Error al cargar el portafolio.');
+      allPortfolio = data || [];
+      applyPortfolioFilters();
+    } catch (err) {
+      setPfTableState('error', err.message);
+    }
+  }
+
+  function applyPortfolioFilters() {
+    const search     = document.getElementById('pf-search').value.toLowerCase();
+    const tipo       = document.getElementById('pf-filter-tipo').value;
+    const activo     = document.getElementById('pf-filter-activo').value;
+    const destacado  = document.getElementById('pf-filter-destacado').value;
+
+    filteredPortfolio = allPortfolio.filter(p => {
+      const matchSearch    = !search || (p.titulo || '').toLowerCase().includes(search) || (p.cliente || '').toLowerCase().includes(search);
+      const matchTipo      = !tipo    || p.tipo_trabajo === tipo;
+      const matchActivo    = activo   === '' || String(p.activo)    === activo;
+      const matchDestacado = destacado === '' || String(p.destacado) === destacado;
+      return matchSearch && matchTipo && matchActivo && matchDestacado;
+    });
+
+    pfCurrentPage = 1;
+    renderPortfolioTable();
+  }
+
+  function renderPortfolioTable() {
+    const tbody   = document.getElementById('pf-table-body');
+    const stateEl = document.getElementById('pf-table-state');
+
+    if (filteredPortfolio.length === 0) {
+      tbody.innerHTML = '';
+      setPfTableState('empty');
+      document.getElementById('pf-pagination').innerHTML = '';
+      return;
+    }
+
+    stateEl.style.display = 'none';
+    document.getElementById('pf-table').style.display = '';
+
+    const start = (pfCurrentPage - 1) * PF_PAGE_SIZE;
+    const page  = filteredPortfolio.slice(start, start + PF_PAGE_SIZE);
+
+    tbody.innerHTML = page.map(p => {
+      const imgs     = Array.isArray(p.imagenes) ? p.imagenes : [];
+      const firstImg = imgs[0] || null;
+      const imgHtml  = firstImg
+        ? `<img class="img-thumb" src="${firstImg}" alt="${escHtml(p.titulo)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'img-placeholder\\'>🏗️</div>'" />`
+        : `<div class="img-placeholder">🏗️</div>`;
+      const fecha = p.fecha_entrega
+        ? new Date(p.fecha_entrega + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'short' })
+        : '—';
+      return `
+        <tr>
+          <td>${imgHtml}</td>
+          <td><strong>${escHtml(p.titulo)}</strong></td>
+          <td>${escHtml(p.cliente || '—')}</td>
+          <td>${escHtml(p.tipo_trabajo || '—')}</td>
+          <td>${fecha}</td>
+          <td style="text-align:center;">${p.destacado ? '⭐' : '—'}</td>
+          <td><span class="badge ${p.activo ? 'badge-activo' : 'badge-inactivo'}">${p.activo ? 'Activo' : 'Inactivo'}</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-edit"   onclick="openPortfolioEdit('${p.id}')">Editar</button>
+              <button class="btn btn-delete" onclick="confirmPfDelete('${p.id}', '${escHtml(p.titulo)}')">Eliminar</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+
+    renderPfPagination();
+  }
+
+  function renderPfPagination() {
+    const total = filteredPortfolio.length;
+    const pages = Math.ceil(total / PF_PAGE_SIZE);
+    const el    = document.getElementById('pf-pagination');
+    if (pages <= 1) { el.innerHTML = ''; return; }
+
+    let html = `<button class="page-btn" onclick="pfGoPage(${pfCurrentPage - 1})" ${pfCurrentPage === 1 ? 'disabled' : ''}>&#8249; Ant.</button>`;
+    for (let i = 1; i <= pages; i++) {
+      if (i === 1 || i === pages || Math.abs(i - pfCurrentPage) <= 2) {
+        html += `<button class="page-btn ${i === pfCurrentPage ? 'active' : ''}" onclick="pfGoPage(${i})">${i}</button>`;
+      } else if (Math.abs(i - pfCurrentPage) === 3) {
+        html += `<span class="page-info">…</span>`;
+      }
+    }
+    html += `<button class="page-btn" onclick="pfGoPage(${pfCurrentPage + 1})" ${pfCurrentPage === pages ? 'disabled' : ''}>Sig. &#8250;</button>`;
+    html += `<span class="page-info">${total} proyecto${total !== 1 ? 's' : ''}</span>`;
+    el.innerHTML = html;
+  }
+
+  function pfGoPage(n) {
+    const pages = Math.ceil(filteredPortfolio.length / PF_PAGE_SIZE);
+    if (n < 1 || n > pages) return;
+    pfCurrentPage = n;
+    renderPortfolioTable();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setPfTableState(state, msg) {
+    const stateEl = document.getElementById('pf-table-state');
+    const table   = document.getElementById('pf-table');
+    table.style.display   = 'none';
+    stateEl.style.display = 'block';
+    if (state === 'loading') {
+      stateEl.innerHTML = '<div class="spinner"></div><p>Cargando proyectos...</p>';
+    } else if (state === 'empty') {
+      stateEl.innerHTML = '<div class="icon">🏗️</div><p>No se encontraron proyectos.</p>';
+    } else if (state === 'error') {
+      stateEl.innerHTML = `<div class="icon">⚠️</div><p>${escHtml(msg || 'Error al cargar.')}</p>`;
+    }
+  }
+
+  // ── Modal portafolio ──
+
+  function openPortfolioCreate() {
+    document.getElementById('pf-modal-title').textContent = 'Nuevo proyecto';
+    document.getElementById('pf-edit-id').value = '';
+    document.getElementById('pf-form').reset();
+    document.getElementById('pf-existing-images').innerHTML = '';
+    document.getElementById('pf-new-previews').innerHTML   = '';
+    document.getElementById('pf-activo').checked    = true;
+    document.getElementById('pf-destacado').checked = false;
+    document.getElementById('pf-form-error').style.display = 'none';
+    document.getElementById('pf-save-btn').textContent = 'Guardar proyecto';
+    document.getElementById('pf-desc-count').textContent = '(0/200)';
+    pfImagesToDelete = [];
+    updatePfPreview();
+    document.getElementById('pf-modal-overlay').classList.add('open');
+    document.getElementById('pf-titulo').focus();
+  }
+
+  function openPortfolioEdit(id) {
+    const p = allPortfolio.find(x => x.id === id);
+    if (!p) return;
+    pfImagesToDelete = [];
+
+    document.getElementById('pf-modal-title').textContent = 'Editar proyecto';
+    document.getElementById('pf-edit-id').value  = p.id;
+    document.getElementById('pf-titulo').value   = p.titulo  || '';
+    document.getElementById('pf-cliente').value  = p.cliente || '';
+    document.getElementById('pf-ubicacion').value = p.ubicacion || '';
+    document.getElementById('pf-fecha').value    = p.fecha_entrega || '';
+    document.getElementById('pf-tipo').value     = p.tipo_trabajo  || '';
+    document.getElementById('pf-desc-corta').value      = p.descripcion_corta      || '';
+    document.getElementById('pf-desc-completa').value   = p.descripcion_completa   || '';
+    document.getElementById('pf-resena').value           = p.resena_cliente         || '';
+    document.getElementById('pf-contacto').value         = p.nombre_contacto_cliente || '';
+    document.getElementById('pf-activo').checked    = !!p.activo;
+    document.getElementById('pf-destacado').checked = !!p.destacado;
+    document.getElementById('pf-form-error').style.display = 'none';
+    document.getElementById('pf-save-btn').textContent = 'Guardar cambios';
+    updatePfDescCount();
+
+    const imagenes = Array.isArray(p.imagenes) ? p.imagenes : [];
+    const wrap = document.getElementById('pf-existing-images');
+    wrap.innerHTML = '';
+    imagenes.forEach(url => {
+      const item = document.createElement('div');
+      item.className = 'existing-img-item';
+      item.innerHTML = `
+        <img src="${url}" alt="" />
+        <button type="button" title="Eliminar imagen" onclick="markPfImageForDelete(this, '${escHtml(url)}')">&#x2715;</button>`;
+      wrap.appendChild(item);
+    });
+
+    document.getElementById('pf-new-previews').innerHTML = '';
+    document.getElementById('pf-imagenes').value = '';
+    updatePfPreview();
+    document.getElementById('pf-modal-overlay').classList.add('open');
+    document.getElementById('pf-titulo').focus();
+  }
+
+  function closePfModal() {
+    document.getElementById('pf-modal-overlay').classList.remove('open');
+    pfImagesToDelete = [];
+  }
+
+  function markPfImageForDelete(btn, url) {
+    pfImagesToDelete.push(url);
+    btn.closest('.existing-img-item').remove();
+    updatePfPreview();
+  }
+
+  function previewPfImages(event) {
+    const wrap = document.getElementById('pf-new-previews');
+    wrap.innerHTML = '';
+    Array.from(event.target.files).forEach(file => {
+      const item = document.createElement('div');
+      item.className = 'existing-img-item';
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = file.name;
+      item.appendChild(img);
+      wrap.appendChild(item);
+    });
+    updatePfPreview();
+  }
+
+  function updatePfDescCount() {
+    const val = document.getElementById('pf-desc-corta').value;
+    document.getElementById('pf-desc-count').textContent = `(${val.length}/200)`;
+    updatePfPreview();
+  }
+
+  function updatePfPreview() {
+    document.getElementById('pf-preview-titulo').textContent  = document.getElementById('pf-titulo').value     || 'Título del proyecto';
+    document.getElementById('pf-preview-cliente').textContent = document.getElementById('pf-cliente').value    || 'Cliente';
+    document.getElementById('pf-preview-tipo').textContent    = document.getElementById('pf-tipo').value       || 'Tipo de trabajo';
+    document.getElementById('pf-preview-desc').textContent    = document.getElementById('pf-desc-corta').value || 'Descripción corta del proyecto...';
+    const destacado = document.getElementById('pf-destacado').checked;
+    document.getElementById('pf-preview-destacado').style.display = destacado ? 'inline-block' : 'none';
+
+    // Imagen en preview
+    const imgWrap      = document.getElementById('pf-preview-img');
+    const existingImgs = document.querySelectorAll('#pf-existing-images .existing-img-item img');
+    const newFiles     = document.getElementById('pf-imagenes').files;
+    if (existingImgs.length > 0) {
+      imgWrap.innerHTML = `<img src="${existingImgs[0].src}" alt="">`;
+    } else if (newFiles && newFiles.length > 0) {
+      imgWrap.innerHTML = `<img src="${URL.createObjectURL(newFiles[0])}" alt="">`;
+    } else {
+      imgWrap.innerHTML = '🏗️';
+    }
+  }
+
+  async function savePortfolio() {
+    const id    = document.getElementById('pf-edit-id').value;
+    const titulo = document.getElementById('pf-titulo').value.trim();
+    const errEl  = document.getElementById('pf-form-error');
+    const saveBtn = document.getElementById('pf-save-btn');
+
+    errEl.style.display = 'none';
+    if (!titulo) { showPfFormError('El título del proyecto es obligatorio.'); return; }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Guardando...';
+
+    try {
+      // 1. Eliminar imágenes marcadas del Storage
+      for (const imgUrl of pfImagesToDelete) {
+        const path = extractPfStoragePath(imgUrl);
+        if (path) await supabaseClient.storage.from(PF_BUCKET).remove([path]);
+      }
+
+      // 2. URLs existentes no eliminadas
+      const remainingUrls = Array.from(
+        document.querySelectorAll('#pf-existing-images .existing-img-item img')
+      ).map(img => img.src);
+
+      // 3. Subir nuevas imágenes
+      const fileInput = document.getElementById('pf-imagenes');
+      const newUrls   = [];
+      for (const file of Array.from(fileInput.files)) {
+        const path = `proyectos/${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabaseClient.storage.from(PF_BUCKET).upload(path, file);
+        if (!uploadError) {
+          const { data: urlData } = supabaseClient.storage.from(PF_BUCKET).getPublicUrl(path);
+          newUrls.push(urlData.publicUrl);
+        }
+      }
+
+      const allImageUrls = [...remainingUrls, ...newUrls];
+
+      const projectData = {
+        titulo,
+        cliente:                  document.getElementById('pf-cliente').value,
+        ubicacion:                document.getElementById('pf-ubicacion').value,
+        fecha_entrega:            document.getElementById('pf-fecha').value || null,
+        tipo_trabajo:             document.getElementById('pf-tipo').value,
+        descripcion_corta:        document.getElementById('pf-desc-corta').value,
+        descripcion_completa:     document.getElementById('pf-desc-completa').value,
+        resena_cliente:           document.getElementById('pf-resena').value,
+        nombre_contacto_cliente:  document.getElementById('pf-contacto').value,
+        imagenes:                 allImageUrls,
+        destacado:                document.getElementById('pf-destacado').checked,
+        activo:                   document.getElementById('pf-activo').checked,
+      };
+
+      let error;
+      if (id) {
+        ({ error } = await supabaseClient.from('portafolio').update(projectData).eq('id', id));
+      } else {
+        ({ error } = await supabaseClient.from('portafolio').insert(projectData));
+      }
+
+      if (error) throw new Error(error.message || 'Error al guardar.');
+
+      await loadPortfolio();
+      closePfModal();
+      showToast(id ? 'Proyecto actualizado.' : 'Proyecto creado.', 'success');
+    } catch (err) {
+      showPfFormError(err.message || 'Error al guardar el proyecto.');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = document.getElementById('pf-edit-id').value ? 'Guardar cambios' : 'Guardar proyecto';
+    }
+  }
+
+  function showPfFormError(msg) {
+    const el = document.getElementById('pf-form-error');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function extractPfStoragePath(url) {
+    const marker = `/storage/v1/object/public/${PF_BUCKET}/`;
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return url.slice(idx + marker.length);
+  }
+
+  function confirmPfDelete(id, name) {
+    document.getElementById('confirm-msg').textContent =
+      `¿Eliminar el proyecto "${name}"? Esta acción no se puede deshacer.`;
+    const okBtn = document.getElementById('confirm-ok-btn');
+    okBtn.onclick = () => deletePfProject(id);
+    document.getElementById('confirm-overlay').classList.add('open');
+  }
+
+  async function deletePfProject(id) {
+    closeConfirm();
+    try {
+      const { error } = await supabaseClient.from('portafolio').delete().eq('id', id);
+      if (error) throw new Error('Error al eliminar el proyecto.');
+      showToast('Proyecto eliminado.', 'success');
+      await loadPortfolio();
+    } catch (err) {
+      showToast(err.message || 'Error al eliminar.', 'error');
+    }
+  }
 
   // ======== INIT ========
   init();
