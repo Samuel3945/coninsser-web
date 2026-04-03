@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CONINSSER — Panel de Administración</title>
+  <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1034,10 +1035,7 @@
 <div id="toast"></div>
 
 <script>
-  const supabaseClient = supabase.createClient(
-    'https://slsjaomaicjbrnzyxela.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsc2phb21haWNqYnJuenl4ZWxhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTIzODkwMywiZXhwIjoyMDkwODE0OTAzfQ.dP6Y5B1MAskZjRTOU5-OrlZmgMiaF0zpGg_6rLrWYPA'
-  );
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const COLLECTION = 'productos';
   const CAT_COLLECTION = 'categorias';
 
