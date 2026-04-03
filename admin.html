@@ -928,7 +928,7 @@
             </div>
           </div>
           <div class="form-group full" id="mayoreo-fields" style="display:none">
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
               <div class="form-group">
                 <label for="f-precio-mayoreo">Precio mayoreo</label>
                 <input type="number" id="f-precio-mayoreo" placeholder="0.00" min="0" step="0.01" />
@@ -937,11 +937,11 @@
                 <label for="f-minimo-mayoreo">Mínimo mayoreo</label>
                 <input type="number" id="f-minimo-mayoreo" placeholder="Ej: 10" min="1" step="1" />
               </div>
-              <div class="form-group">
-                <label for="f-unidad-medida">Unidad de medida</label>
-                <input type="text" id="f-unidad-medida" placeholder="Ej: unidades, kg, m²" />
-              </div>
             </div>
+          </div>
+          <div class="form-group">
+            <label for="f-unidad-medida">Unidad de medida</label>
+            <input type="text" id="f-unidad-medida" placeholder="Ej: unidades, kg, m²" />
           </div>
           <div class="form-group">
             <label for="f-stock">Stock</label>
@@ -1435,7 +1435,7 @@
         vende_mayoreo: vendeMayoreo,
         precio_mayoreo: vendeMayoreo ? (parseFloat(document.getElementById('f-precio-mayoreo').value) || 0) : 0,
         minimo_mayoreo: vendeMayoreo ? (parseInt(document.getElementById('f-minimo-mayoreo').value) || 0) : 0,
-        unidad_medida: vendeMayoreo ? document.getElementById('f-unidad-medida').value : '',
+        unidad_medida: document.getElementById('f-unidad-medida').value,
         stock: parseInt(document.getElementById('f-stock').value) || 0,
         categoria_id: document.getElementById('f-categoria').value || null,
         activo: document.getElementById('f-activo').checked,
