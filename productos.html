@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ══ PRODUCTOS PAGE ══ */
     .prod-hero {
@@ -772,9 +773,10 @@
    CONINSSER — productos.js (inline)
    ══════════════════════════════════════ */
 
-const PB_URL   = 'https://conniser-pocketbase.kmy1zc.easypanel.host';
-const PB_FILES = (collectionId, recordId, filename) =>
-  `${PB_URL}/api/files/${collectionId}/${recordId}/${filename}`;
+const supabaseClient = supabase.createClient(
+  'https://slsjaomaicjbrnzyxela.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsc2phb21haWNqYnJuenl4ZWxhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTIzODkwMywiZXhwIjoyMDkwODE0OTAzfQ.dP6Y5B1MAskZjRTOU5-OrlZmgMiaF0zpGg_6rLrWYPA'
+);
 
 let allCategorias = [];
 let allProductos  = [];
@@ -801,15 +803,13 @@ function showToast(msg) {
 /* ── INIT ── */
 async function init() {
   try {
-    const [catRes, prodRes] = await Promise.all([
-      fetch(`${PB_URL}/api/collections/categorias/records?perPage=200`),
-      fetch(`${PB_URL}/api/collections/productos/records?expand=categoria&filter=(activo=true)&perPage=500`)
+    const [{ data: catData, error: catError }, { data: prodData, error: prodError }] = await Promise.all([
+      supabaseClient.from('categorias').select('*'),
+      supabaseClient.from('productos').select('*, categorias(*)').eq('activo', true)
     ]);
-    if (!catRes.ok || !prodRes.ok) throw new Error('Error al cargar datos');
-    const catData  = await catRes.json();
-    const prodData = await prodRes.json();
-    allCategorias = catData.items  || catData.data  || [];
-    allProductos  = prodData.items || prodData.data || [];
+    if (catError || prodError) throw new Error('Error al cargar datos');
+    allCategorias = catData  || [];
+    allProductos  = prodData || [];
     renderCategorias();
   } catch (err) {
     console.error(err);
@@ -831,13 +831,10 @@ function renderCategorias() {
   }
 
   grid.innerHTML = allCategorias.map(cat => {
-    const count = allProductos.filter(p => {
-      const catId = p.categoria || (p.expand && p.expand.categoria && p.expand.categoria.id);
-      return catId === cat.id;
-    }).length;
+    const count = allProductos.filter(p => p.categoria_id === cat.id).length;
 
     const hasImg = cat.img && cat.img.length > 0;
-    const imgSrc = hasImg ? PB_FILES('categorias', cat.id, Array.isArray(cat.img) ? cat.img[0] : cat.img) : '';
+    const imgSrc = hasImg ? cat.img : '';
     const icono  = cat.icono || '📦';
 
     if (hasImg) {
@@ -877,10 +874,7 @@ function showProductos(catId, catNombre) {
   document.getElementById('hero-title').textContent = catNombre;
   document.getElementById('hero-sub').textContent   = 'Productos disponibles en esta categoría.';
 
-  const prods = allProductos.filter(p => {
-    const catId2 = p.categoria || (p.expand && p.expand.categoria && p.expand.categoria.id);
-    return catId2 === catId;
-  });
+  const prods = allProductos.filter(p => p.categoria_id === catId);
   filteredProds = prods;
   renderProductos(prods);
 
@@ -910,8 +904,8 @@ function renderProductos(prods) {
   empty.style.display = 'none';
 
   grid.innerHTML = prods.map(p => {
-    const imgs     = Array.isArray(p.imagen) ? p.imagen : (p.imagen ? [p.imagen] : []);
-    const firstImg = imgs.length ? PB_FILES('productos', p.id, imgs[0]) : null;
+    const imgs     = Array.isArray(p.imagenes) ? p.imagenes : (p.imagenes ? [p.imagenes] : []);
+    const firstImg = imgs.length ? imgs[0] : null;
     const agotado  = p.stock !== undefined && p.stock !== null && p.stock === 0;
 
     return `
@@ -949,10 +943,7 @@ function renderProductos(prods) {
 /* ── FILTER ── */
 function filterProducts() {
   const q     = document.getElementById('search-input').value.toLowerCase().trim();
-  const prods = allProductos.filter(p => {
-    const catId2 = p.categoria || (p.expand && p.expand.categoria && p.expand.categoria.id);
-    return catId2 === currentCatId;
-  });
+  const prods = allProductos.filter(p => p.categoria_id === currentCatId);
   const filtered = q ? prods.filter(p => (p.nombre || '').toLowerCase().includes(q)) : prods;
   filteredProds  = filtered;
   renderProductos(filtered);
@@ -964,18 +955,18 @@ function openModal(prodId) {
   if (!prod) return;
   currentModal = prod;
 
-  const imgs    = Array.isArray(prod.imagen) ? prod.imagen : (prod.imagen ? [prod.imagen] : []);
+  const imgs    = Array.isArray(prod.imagenes) ? prod.imagenes : (prod.imagenes ? [prod.imagenes] : []);
   const agotado = prod.stock !== undefined && prod.stock !== null && prod.stock === 0;
-  const catName = prod.expand && prod.expand.categoria ? prod.expand.categoria.nombre : '';
+  const catName = prod.categorias ? prod.categorias.nombre : '';
 
   // gallery
   const gallery = document.getElementById('modal-gallery');
   if (imgs.length) {
-    const thumbsHtml = imgs.map((img, i) =>
-      `<img class="prod-modal__thumb ${i === 0 ? 'active' : ''}" src="${PB_FILES('productos', prod.id, img)}" alt="" onclick="setMainImg(this)">`
+    const thumbsHtml = imgs.map((imgUrl, i) =>
+      `<img class="prod-modal__thumb ${i === 0 ? 'active' : ''}" src="${imgUrl}" alt="" onclick="setMainImg(this)">`
     ).join('');
     gallery.innerHTML = `
-      <img class="prod-modal__main-img" id="modal-main-img" src="${PB_FILES('productos', prod.id, imgs[0])}" alt="${escHtml(prod.nombre)}">
+      <img class="prod-modal__main-img" id="modal-main-img" src="${imgs[0]}" alt="${escHtml(prod.nombre)}">
       ${imgs.length > 1 ? `<div class="prod-modal__thumbs">${thumbsHtml}</div>` : ''}
     `;
   } else {
