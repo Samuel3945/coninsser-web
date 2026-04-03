@@ -512,68 +512,123 @@
       background: var(--blanco);
       border-radius: 8px;
       width: 100%;
-      max-width: 420px;
+      max-width: 520px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-    }
-
-    .cat-modal .modal-header { border-radius: 8px 8px 0 0; }
-
-    .cat-modal-body { padding: 18px 18px 8px; }
-
-    .cat-chips {
+      max-height: 90vh;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      flex-direction: column;
+    }
+
+    .cat-modal .modal-header { border-radius: 8px 8px 0 0; flex-shrink: 0; }
+
+    .cat-modal-body { padding: 18px 18px 12px; overflow-y: auto; flex: 1; }
+
+    /* ---- Category list cards ---- */
+    .cat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       min-height: 40px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
-    .cat-chip {
-      display: inline-flex;
+    .cat-card {
+      display: flex;
       align-items: center;
-      gap: 5px;
-      background: #e8eaf6;
+      gap: 12px;
+      background: #f5f7ff;
       border: 1px solid #c5cae9;
-      color: var(--azul);
-      border-radius: 20px;
-      padding: 5px 10px;
-      font-size: 0.85rem;
-      font-weight: 500;
+      border-radius: 8px;
+      padding: 10px 12px;
     }
 
-    .cat-chip .chip-del {
+    .cat-card-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #e8eaf6;
+    }
+
+    .cat-card-img-placeholder {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      background: #e8eaf6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .cat-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cat-card-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--azul);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cat-card-desc {
+      font-size: 0.78rem;
+      color: var(--gris-texto);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cat-card-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .chip-edit, .chip-del {
       background: none;
       border: none;
-      color: var(--rojo);
       cursor: pointer;
-      font-size: 0.75rem;
-      padding: 0 2px;
-      line-height: 1;
+      font-size: 0.82rem;
+      padding: 4px 7px;
+      border-radius: 4px;
       font-weight: 700;
+      line-height: 1;
     }
 
-    .cat-chip .chip-del:hover { color: #b71c1c; }
+    .chip-edit { color: var(--azul); background: #e8eaf6; }
+    .chip-edit:hover { background: #c5cae9; }
+    .chip-del { color: var(--rojo); background: #ffebee; }
+    .chip-del:hover { background: #ffcdd2; }
 
+    /* ---- Add / Edit form ---- */
     .cat-add-form {
       border-top: 1px solid var(--gris);
       padding: 14px 0 6px;
     }
 
-    .cat-add-form label {
+    .cat-form-label {
       display: block;
       font-size: 0.78rem;
       font-weight: 600;
       color: var(--azul);
+      margin-bottom: 10px;
+    }
+
+    .cat-field-row {
+      display: flex;
+      gap: 8px;
       margin-bottom: 8px;
     }
 
-    .cat-add-row {
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-    }
-
-    .cat-add-row .cat-input-icono {
+    .cat-input-icono {
       width: 68px;
       flex-shrink: 0;
       padding: 8px 8px;
@@ -584,7 +639,7 @@
       outline: none;
     }
 
-    .cat-add-row .cat-input-nombre {
+    .cat-input-nombre {
       flex: 1;
       padding: 8px 10px;
       border: 1px solid var(--gris);
@@ -593,22 +648,79 @@
       outline: none;
     }
 
-    .cat-add-row input:focus { border-color: var(--azul-hover); }
+    .cat-input-descripcion {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--gris);
+      border-radius: 5px;
+      font-size: 0.88rem;
+      outline: none;
+      resize: vertical;
+      font-family: inherit;
+      margin-bottom: 8px;
+    }
 
-    .cat-add-row .btn-add-cat {
+    .cat-input-icono:focus,
+    .cat-input-nombre:focus,
+    .cat-input-descripcion:focus { border-color: var(--azul-hover); }
+
+    .cat-file-row {
+      margin-bottom: 10px;
+    }
+
+    .cat-file-label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--gris-texto);
+      margin-bottom: 4px;
+    }
+
+    .cat-file-row input[type="file"] {
+      font-size: 0.82rem;
+      width: 100%;
+    }
+
+    .cat-img-preview {
+      margin-top: 6px;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--gris);
+    }
+
+    .cat-form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .btn-add-cat {
       background: var(--azul);
       color: var(--blanco);
       border: none;
       border-radius: 5px;
-      padding: 8px 14px;
+      padding: 9px 18px;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      white-space: nowrap;
     }
 
-    .cat-add-row .btn-add-cat:hover { background: var(--azul-hover); }
-    .cat-add-row .btn-add-cat:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-add-cat:hover { background: var(--azul-hover); }
+    .btn-add-cat:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-cancel-cat {
+      background: #eee;
+      color: #444;
+      border: none;
+      border-radius: 5px;
+      padding: 9px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-cancel-cat:hover { background: #ddd; }
 
     .cat-empty { color: var(--gris-texto); font-size: 0.85rem; font-style: italic; }
 
@@ -870,15 +982,24 @@
       <button class="modal-close" onclick="closeCatModal()">&#x2715;</button>
     </div>
     <div class="cat-modal-body">
-      <div id="cat-chips" class="cat-chips">
+      <div id="cat-chips" class="cat-list">
         <span class="cat-empty">Cargando...</span>
       </div>
       <div class="cat-add-form">
-        <label>Nueva categoría</label>
-        <div class="cat-add-row">
+        <label class="cat-form-label" id="cat-form-title">Nueva categoría</label>
+        <div class="cat-field-row">
           <input type="text" class="cat-input-icono" id="cat-icono" placeholder="🧱" maxlength="4" />
           <input type="text" class="cat-input-nombre" id="cat-nombre" placeholder="Nombre de la categoría" />
-          <button class="btn-add-cat" id="cat-add-btn" onclick="addCategory()">Agregar</button>
+        </div>
+        <textarea class="cat-input-descripcion" id="cat-descripcion" placeholder="Descripción (opcional)" rows="2"></textarea>
+        <div class="cat-file-row">
+          <label class="cat-file-label" for="cat-img">Imagen de la categoría</label>
+          <input type="file" id="cat-img" accept="image/*" onchange="previewCatImg(this)" />
+          <img id="cat-img-preview" class="cat-img-preview" src="" alt="" style="display:none;" />
+        </div>
+        <div class="cat-form-actions">
+          <button class="btn-add-cat" id="cat-add-btn" onclick="submitCategoryForm()">Agregar</button>
+          <button class="btn-cancel-cat" id="cat-cancel-edit-btn" onclick="cancelCatEdit()" style="display:none;">Cancelar</button>
         </div>
       </div>
     </div>
@@ -1401,8 +1522,55 @@
 
   function closeCatModal() {
     document.getElementById('cat-overlay').classList.remove('open');
+    cancelCatEdit();
+  }
+
+  let editingCatId = null;
+
+  function cancelCatEdit() {
+    editingCatId = null;
     document.getElementById('cat-nombre').value = '';
     document.getElementById('cat-icono').value = '';
+    document.getElementById('cat-descripcion').value = '';
+    document.getElementById('cat-img').value = '';
+    document.getElementById('cat-img-preview').style.display = 'none';
+    document.getElementById('cat-img-preview').src = '';
+    document.getElementById('cat-form-title').textContent = 'Nueva categoría';
+    document.getElementById('cat-add-btn').textContent = 'Agregar';
+    document.getElementById('cat-cancel-edit-btn').style.display = 'none';
+  }
+
+  function previewCatImg(input) {
+    const preview = document.getElementById('cat-img-preview');
+    if (input.files && input.files[0]) {
+      preview.src = URL.createObjectURL(input.files[0]);
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+      preview.src = '';
+    }
+  }
+
+  function editCategory(id) {
+    const cat = allCategories.find(c => c.id === id);
+    if (!cat) return;
+    editingCatId = id;
+    document.getElementById('cat-icono').value = cat.icono || '';
+    document.getElementById('cat-nombre').value = cat.nombre || '';
+    document.getElementById('cat-descripcion').value = cat.descripcion || '';
+    document.getElementById('cat-img').value = '';
+    const preview = document.getElementById('cat-img-preview');
+    if (cat.img) {
+      preview.src = `${BASE}/api/files/${CAT_COLLECTION}/${cat.id}/${cat.img}`;
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+      preview.src = '';
+    }
+    document.getElementById('cat-form-title').textContent = 'Editar categoría';
+    document.getElementById('cat-add-btn').textContent = 'Guardar cambios';
+    document.getElementById('cat-cancel-edit-btn').style.display = 'inline-flex';
+    document.getElementById('cat-nombre').focus();
   }
 
   function renderCategoryChips() {
@@ -1411,16 +1579,33 @@
       wrap.innerHTML = '<span class="cat-empty">Aún no hay categorías.</span>';
       return;
     }
-    wrap.innerHTML = allCategories.map(c => `
-      <span class="cat-chip">
-        ${c.icono ? escHtml(c.icono) + ' ' : ''}${escHtml(c.nombre)}
-        <button class="chip-del" onclick="deleteCategory('${c.id}', '${escHtml(c.nombre)}')" title="Eliminar">&#x2715;</button>
-      </span>`).join('');
+    wrap.innerHTML = allCategories.map(c => {
+      const imgHtml = c.img
+        ? `<img class="cat-card-img" src="${BASE}/api/files/${CAT_COLLECTION}/${c.id}/${c.img}" alt="${escHtml(c.nombre)}" />`
+        : `<div class="cat-card-img-placeholder">${c.icono ? escHtml(c.icono) : '🏷️'}</div>`;
+      const descHtml = c.descripcion
+        ? `<div class="cat-card-desc">${escHtml(c.descripcion)}</div>`
+        : '';
+      return `
+      <div class="cat-card">
+        ${imgHtml}
+        <div class="cat-card-info">
+          <div class="cat-card-title">${c.icono && !c.img ? '' : (c.icono ? escHtml(c.icono) + ' ' : '')}${escHtml(c.nombre)}</div>
+          ${descHtml}
+        </div>
+        <div class="cat-card-actions">
+          <button class="chip-edit" onclick="editCategory('${c.id}')" title="Editar">✏️</button>
+          <button class="chip-del" onclick="deleteCategory('${c.id}', '${escHtml(c.nombre)}')" title="Eliminar">&#x2715;</button>
+        </div>
+      </div>`;
+    }).join('');
   }
 
-  async function addCategory() {
+  async function submitCategoryForm() {
     const nombre = document.getElementById('cat-nombre').value.trim();
     const icono = document.getElementById('cat-icono').value.trim();
+    const descripcion = document.getElementById('cat-descripcion').value.trim();
+    const imgFile = document.getElementById('cat-img').files[0];
     if (!nombre) { document.getElementById('cat-nombre').focus(); return; }
 
     const btn = document.getElementById('cat-add-btn');
@@ -1429,30 +1614,50 @@
 
     try {
       const token = localStorage.getItem('pb_admin_token');
-      const res = await fetch(`${BASE}/api/collections/${CAT_COLLECTION}/records`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ nombre, icono })
-      });
-      if (res.status === 401) { doLogout(); return; }
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error al crear categoría.');
+      const formData = new FormData();
+      formData.append('nombre', nombre);
+      formData.append('icono', icono);
+      formData.append('descripcion', descripcion);
+      if (imgFile) formData.append('img', imgFile);
 
-      allCategories.push(data);
-      allCategories.sort((a, b) => a.nombre.localeCompare(b.nombre));
-      document.getElementById('cat-nombre').value = '';
-      document.getElementById('cat-icono').value = '';
-      renderCategoryChips();
-      populateCategorySelects();
-      showToast('Categoría creada.', 'success');
+      if (editingCatId) {
+        // Update existing
+        const res = await fetch(`${BASE}/api/collections/${CAT_COLLECTION}/records/${editingCatId}`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+        if (res.status === 401) { doLogout(); return; }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al actualizar categoría.');
+        const idx = allCategories.findIndex(c => c.id === editingCatId);
+        if (idx !== -1) allCategories[idx] = data;
+        allCategories.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        cancelCatEdit();
+        renderCategoryChips();
+        populateCategorySelects();
+        showToast('Categoría actualizada.', 'success');
+      } else {
+        // Create new
+        const res = await fetch(`${BASE}/api/collections/${CAT_COLLECTION}/records`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+        if (res.status === 401) { doLogout(); return; }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al crear categoría.');
+        allCategories.push(data);
+        allCategories.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        cancelCatEdit();
+        renderCategoryChips();
+        populateCategorySelects();
+        showToast('Categoría creada.', 'success');
+      }
     } catch (err) {
-      showToast(err.message || 'Error al crear.', 'error');
-    } finally {
+      showToast(err.message || 'Error al guardar.', 'error');
       btn.disabled = false;
-      btn.textContent = 'Agregar';
+      btn.textContent = editingCatId ? 'Guardar cambios' : 'Agregar';
     }
   }
 
