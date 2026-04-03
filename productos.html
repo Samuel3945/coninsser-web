@@ -910,7 +910,7 @@ function renderProductos(prods) {
   empty.style.display = 'none';
 
   grid.innerHTML = prods.map(p => {
-    const imgs     = Array.isArray(p.img) ? p.img : (p.img ? [p.img] : []);
+    const imgs     = Array.isArray(p.imagen) ? p.imagen : (p.imagen ? [p.imagen] : []);
     const firstImg = imgs.length ? PB_FILES('productos', p.id, imgs[0]) : null;
     const agotado  = p.stock !== undefined && p.stock !== null && p.stock === 0;
 
@@ -964,7 +964,7 @@ function openModal(prodId) {
   if (!prod) return;
   currentModal = prod;
 
-  const imgs    = Array.isArray(prod.img) ? prod.img : (prod.img ? [prod.img] : []);
+  const imgs    = Array.isArray(prod.imagen) ? prod.imagen : (prod.imagen ? [prod.imagen] : []);
   const agotado = prod.stock !== undefined && prod.stock !== null && prod.stock === 0;
   const catName = prod.expand && prod.expand.categoria ? prod.expand.categoria.nombre : '';
 
