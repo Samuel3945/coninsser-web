@@ -287,6 +287,191 @@
 
 </section>
 
+<!-- ══ PRODUCTOS ══ -->
+<section class="section section--gray" id="productos">
+  <div class="container">
+
+    <div class="services__header reveal">
+      <div>
+        <span class="label">Tienda en línea</span>
+        <h2 class="title">Materiales y Equipos<br>a su Alcance</h2>
+      </div>
+    </div>
+
+    <!-- Layout: razones + categorías -->
+    <div class="prod-promo reveal">
+
+      <!-- Razones -->
+      <div class="prod-razones">
+        <p class="prod-razones__intro">
+          En CONINSSER no solo ejecutamos obras — también suministramos los materiales
+          y equipos que su proyecto necesita, disponibles por unidad y al por mayor.
+        </p>
+        <ul class="prod-razones__list">
+          <li>
+            <strong>Productos verificados</strong>
+            Seleccionados por nuestros ingenieros para garantizar calidad en obra.
+          </li>
+          <li>
+            <strong>Disponibilidad en Cartagena</strong>
+            Stock disponible para entrega o retiro en la Costa Caribe.
+          </li>
+          <li>
+            <strong>Asesoría técnica incluida</strong>
+            Nuestros expertos le ayudan a elegir el producto correcto para su proyecto.
+          </li>
+          <li>
+            <strong>Precios de mayoreo</strong>
+            Tarifas especiales para contratistas, constructores y distribuidores.
+          </li>
+        </ul>
+        <a href="productos.html" class="btn btn--navy btn--lg">Ver catálogo completo</a>
+      </div>
+
+      <!-- Categorías destacadas -->
+      <div class="prod-cats" id="home-cats">
+        <!-- cargadas por JS -->
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .prod-promo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: start;
+    margin-top: 48px;
+  }
+  .prod-razones__intro {
+    font-size: 15px;
+    color: var(--gray-700);
+    line-height: 1.75;
+    margin-bottom: 28px;
+  }
+  .prod-razones__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 36px;
+  }
+  .prod-razones__list li {
+    font-size: 14px;
+    color: var(--gray-600, #4B5563);
+    line-height: 1.55;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .prod-razones__list li:first-child { border-top: 1px solid var(--gray-200); }
+  .prod-razones__list li strong {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .prod-cats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .home-cat-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    background: var(--gray-200);
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+  .home-cat-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s;
+  }
+  .home-cat-card:hover img { transform: scale(1.05); }
+  .home-cat-card__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,27,62,0.78) 0%, transparent 60%);
+  }
+  .home-cat-card__name {
+    position: absolute;
+    bottom: 12px;
+    left: 14px;
+    right: 14px;
+    font-family: var(--font-h);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .home-cat-card--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border: 1.5px solid var(--gray-200);
+  }
+  .home-cat-card--placeholder .home-cat-card__placeholder-name {
+    font-family: var(--font-h);
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--navy);
+    text-align: center;
+    padding: 12px;
+  }
+  @media (max-width: 860px) {
+    .prod-promo { grid-template-columns: 1fr; gap: 36px; }
+  }
+  @media (max-width: 480px) {
+    .prod-cats { grid-template-columns: 1fr 1fr; gap: 10px; }
+  }
+</style>
+
+<script>
+(function() {
+  const PB = 'https://conniser-pocketbase.kmy1zc.easypanel.host';
+  fetch(`${PB}/api/collections/categorias/records?perPage=4&sort=created`)
+    .then(r => r.json())
+    .then(data => {
+      const cats = data.items || data.data || [];
+      const wrap = document.getElementById('home-cats');
+      if (!wrap) return;
+      wrap.innerHTML = cats.map(cat => {
+        const imgArr = Array.isArray(cat.img) ? cat.img : (cat.img ? [cat.img] : []);
+        const hasImg = imgArr.length > 0;
+        const imgSrc = hasImg ? `${PB}/api/files/categorias/${cat.id}/${imgArr[0]}` : null;
+        if (hasImg) {
+          return `<a href="productos.html" class="home-cat-card">
+            <img src="${imgSrc}" alt="${cat.nombre}" loading="lazy">
+            <div class="home-cat-card__overlay"></div>
+            <span class="home-cat-card__name">${cat.nombre}</span>
+          </a>`;
+        } else {
+          return `<a href="productos.html" class="home-cat-card home-cat-card--placeholder">
+            <span class="home-cat-card__placeholder-name">${cat.nombre}</span>
+          </a>`;
+        }
+      }).join('');
+    })
+    .catch(() => {
+      const wrap = document.getElementById('home-cats');
+      if (wrap) wrap.style.display = 'none';
+    });
+})();
+</script>
+
 <!-- ══ CTA ══ -->
 <section class="section section--navy cta reveal">
   <div class="container">
