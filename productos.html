@@ -836,8 +836,8 @@ function renderCategorias() {
       return catId === cat.id;
     }).length;
 
-    const hasImg = cat.imagen && cat.imagen.length > 0;
-    const imgSrc = hasImg ? PB_FILES('categorias', cat.id, Array.isArray(cat.imagen) ? cat.imagen[0] : cat.imagen) : '';
+    const hasImg = cat.img && cat.img.length > 0;
+    const imgSrc = hasImg ? PB_FILES('categorias', cat.id, Array.isArray(cat.img) ? cat.img[0] : cat.img) : '';
     const icono  = cat.icono || '📦';
 
     if (hasImg) {
@@ -910,7 +910,7 @@ function renderProductos(prods) {
   empty.style.display = 'none';
 
   grid.innerHTML = prods.map(p => {
-    const imgs    = Array.isArray(p.imagenes) ? p.imagenes : (p.imagenes ? [p.imagenes] : []);
+    const imgs     = Array.isArray(p.img) ? p.img : (p.img ? [p.img] : []);
     const firstImg = imgs.length ? PB_FILES('productos', p.id, imgs[0]) : null;
     const agotado  = p.stock !== undefined && p.stock !== null && p.stock === 0;
 
@@ -926,13 +926,13 @@ function renderProductos(prods) {
           <p class="prod-card__name">${escHtml(p.nombre)}</p>
           ${p.descripcion ? `<p class="prod-card__desc">${escHtml(truncate(p.descripcion, 80))}</p>` : ''}
           <div class="prod-card__prices">
-            ${p.precio !== undefined && p.precio !== null
-              ? `<p class="prod-card__price">${fmt(p.precio)}</p>`
+            ${p.precio_normal !== undefined && p.precio_normal !== null
+              ? `<p class="prod-card__price">${fmt(p.precio_normal)}</p>`
               : ''}
-            ${p.precio_mayoreo !== undefined && p.precio_mayoreo !== null
+            ${p.vende_mayoreo === true
               ? `<div class="prod-card__price-mayoreo">
                    <span class="prod-card__price-mayoreo-label">Precio mayoreo</span>
-                   <span class="prod-card__price-mayoreo-val">${fmt(p.precio_mayoreo)}</span>
+                   <span class="prod-card__price-mayoreo-val">${fmt(p.precio_mayoreo)}${p.minimo_mayoreo ? ` (desde ${p.minimo_mayoreo}${p.unidad_medida ? ' ' + escHtml(p.unidad_medida) : ''})` : ''}</span>
                  </div>`
               : ''}
             ${p.stock !== undefined && p.stock !== null
@@ -964,7 +964,7 @@ function openModal(prodId) {
   if (!prod) return;
   currentModal = prod;
 
-  const imgs    = Array.isArray(prod.imagenes) ? prod.imagenes : (prod.imagenes ? [prod.imagenes] : []);
+  const imgs    = Array.isArray(prod.img) ? prod.img : (prod.img ? [prod.img] : []);
   const agotado = prod.stock !== undefined && prod.stock !== null && prod.stock === 0;
   const catName = prod.expand && prod.expand.categoria ? prod.expand.categoria.nombre : '';
 
@@ -989,15 +989,15 @@ function openModal(prodId) {
     <h2 class="prod-modal__name">${escHtml(prod.nombre)}</h2>
     ${prod.descripcion ? `<p class="prod-modal__desc">${escHtml(prod.descripcion)}</p>` : ''}
     <div class="prod-modal__prices">
-      ${prod.precio !== undefined && prod.precio !== null ? `
+      ${prod.precio_normal !== undefined && prod.precio_normal !== null ? `
         <div class="prod-modal__price-row">
           <span class="prod-modal__price-lbl">Precio unitario</span>
-          <span class="prod-modal__price-val">${fmt(prod.precio)}</span>
+          <span class="prod-modal__price-val">${fmt(prod.precio_normal)}</span>
         </div>` : ''}
-      ${prod.precio_mayoreo !== undefined && prod.precio_mayoreo !== null ? `
-        ${prod.precio !== undefined ? '<hr class="prod-modal__divider">' : ''}
+      ${prod.vende_mayoreo === true ? `
+        <hr class="prod-modal__divider">
         <div class="prod-modal__price-row prod-modal__price-mayoreo">
-          <span class="prod-modal__price-lbl">Precio mayoreo</span>
+          <span class="prod-modal__price-lbl">Precio mayoreo${prod.minimo_mayoreo ? ` (desde ${prod.minimo_mayoreo}${prod.unidad_medida ? ' ' + escHtml(prod.unidad_medida) : ''})` : ''}</span>
           <span class="prod-modal__price-val">${fmt(prod.precio_mayoreo)}</span>
         </div>` : ''}
     </div>

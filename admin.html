@@ -808,9 +808,27 @@
             <label for="f-precio-normal">Precio normal *</label>
             <input type="number" id="f-precio-normal" placeholder="0.00" min="0" step="0.01" required />
           </div>
-          <div class="form-group">
-            <label for="f-precio-mayoreo">Precio mayoreo</label>
-            <input type="number" id="f-precio-mayoreo" placeholder="0.00" min="0" step="0.01" />
+          <div class="form-group full">
+            <div class="checkbox-group">
+              <input type="checkbox" id="f-vende-mayoreo" onchange="toggleMayoreoFields()">
+              <label for="f-vende-mayoreo">¿Vende al por mayor?</label>
+            </div>
+          </div>
+          <div class="form-group full" id="mayoreo-fields" style="display:none">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+              <div class="form-group">
+                <label for="f-precio-mayoreo">Precio mayoreo</label>
+                <input type="number" id="f-precio-mayoreo" placeholder="0.00" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="f-minimo-mayoreo">Mínimo mayoreo</label>
+                <input type="number" id="f-minimo-mayoreo" placeholder="Ej: 10" min="1" step="1" />
+              </div>
+              <div class="form-group">
+                <label for="f-unidad-medida">Unidad de medida</label>
+                <input type="text" id="f-unidad-medida" placeholder="Ej: unidades, kg, m²" />
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="f-stock">Stock</label>
@@ -1176,6 +1194,8 @@
     document.getElementById('existing-images').innerHTML = '';
     document.getElementById('new-img-previews').innerHTML = '';
     document.getElementById('f-activo').checked = true;
+    document.getElementById('f-vende-mayoreo').checked = false;
+    document.getElementById('mayoreo-fields').style.display = 'none';
     document.getElementById('form-error').style.display = 'none';
     document.getElementById('save-btn').textContent = 'Guardar producto';
     populateCategorySelects();
@@ -1198,9 +1218,13 @@
     document.getElementById('f-descripcion').value = p.descripcion || '';
     document.getElementById('f-precio-normal').value = p.precio_normal ?? '';
     document.getElementById('f-precio-mayoreo').value = p.precio_mayoreo ?? '';
+    document.getElementById('f-minimo-mayoreo').value = p.minimo_mayoreo ?? '';
+    document.getElementById('f-unidad-medida').value = p.unidad_medida || '';
     document.getElementById('f-stock').value = p.stock ?? '';
     document.getElementById('f-categoria').value = p.categoria || '';
     document.getElementById('f-activo').checked = !!p.activo;
+    document.getElementById('f-vende-mayoreo').checked = !!p.vende_mayoreo;
+    document.getElementById('mayoreo-fields').style.display = p.vende_mayoreo ? 'block' : 'none';
     document.getElementById('form-error').style.display = 'none';
     document.getElementById('save-btn').textContent = 'Guardar cambios';
     populateCategorySelects();
@@ -1230,6 +1254,11 @@
   function markImageForDelete(btn, filename) {
     imagesToDelete.push(filename);
     btn.closest('.existing-img-item').remove();
+  }
+
+  function toggleMayoreoFields() {
+    const show = document.getElementById('f-vende-mayoreo').checked;
+    document.getElementById('mayoreo-fields').style.display = show ? 'block' : 'none';
   }
 
   function openModal() {
@@ -1281,7 +1310,11 @@
       formData.append('nombre', nombre);
       formData.append('descripcion', document.getElementById('f-descripcion').value);
       formData.append('precio_normal', parseFloat(precio_normal) || 0);
-      formData.append('precio_mayoreo', parseFloat(document.getElementById('f-precio-mayoreo').value) || 0);
+      const vendeMayoreo = document.getElementById('f-vende-mayoreo').checked;
+      formData.append('vende_mayoreo', vendeMayoreo);
+      formData.append('precio_mayoreo', vendeMayoreo ? (parseFloat(document.getElementById('f-precio-mayoreo').value) || 0) : 0);
+      formData.append('minimo_mayoreo', vendeMayoreo ? (parseInt(document.getElementById('f-minimo-mayoreo').value) || 0) : 0);
+      formData.append('unidad_medida', vendeMayoreo ? document.getElementById('f-unidad-medida').value : '');
       formData.append('stock', parseInt(document.getElementById('f-stock').value) || 0);
       formData.append('categoria', document.getElementById('f-categoria').value);
       formData.append('activo', document.getElementById('f-activo').checked);
