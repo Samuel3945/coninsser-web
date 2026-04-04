@@ -142,14 +142,24 @@
     const container = document.getElementById('pf-projects');
 
     try {
-      const { data: projects, error } = await supabaseClient
+      // Fetch all active projects — sort client-side so missing columns don't break the query
+      const { data: raw, error } = await supabaseClient
         .from('portafolio')
         .select('*')
         .eq('activo', true)
-        .order('orden', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: true });
 
       if (error) throw error;
+
+      // Sort by orden (if column exists), nulls last
+      const projects = (raw || []).slice().sort((a, b) => {
+        const ao = a.orden ?? null;
+        const bo = b.orden ?? null;
+        if (ao !== null && bo !== null) return ao - bo;
+        if (ao !== null) return -1;
+        if (bo !== null) return 1;
+        return 0;
+      });
 
       loading.style.display = 'none';
 
@@ -162,13 +172,13 @@
         const isReversed = i % 2 !== 0;
         const reverseClass = isReversed ? ' project-block--rev' : '';
 
-        const imagenes = Array.isArray(p.imagenes) ? p.imagenes : [];
+        const imagenes = parseImages(p.imagenes);
         const imgSrc = imagenes.length > 0 ? imagenes[0] : '';
         const imgHtml = imgSrc
           ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(p.titulo || '')}">`
           : `<div style="width:100%;height:100%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:3rem;">🏗️</div>`;
 
-        const servicios = Array.isArray(p.servicios) ? p.servicios : [];
+        const servicios = parseImages(p.servicios); // reuses same safe-parse logic
         const tagsHtml = servicios.length > 0
           ? servicios.map(s => `<span class="p-tag">${escHtml(s)}</span>`).join('')
           : (p.tipo_trabajo ? `<span class="p-tag">${escHtml(p.tipo_trabajo)}</span>` : '');
@@ -208,6 +218,18 @@
       container.innerHTML = '<p style="text-align:center;color:#666;padding:40px 0;">Error al cargar los proyectos. Por favor intente más tarde.</p>';
       console.error('Error cargando portafolio:', err);
     }
+  }
+
+  function parseImages(val) {
+    if (!val) return [];
+    if (Array.isArray(val)) return val.filter(Boolean);
+    if (typeof val === 'string') {
+      if (val.startsWith('{') && val.endsWith('}')) {
+        return val.slice(1, -1).split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+      }
+      return [val];
+    }
+    return [];
   }
 
   function escHtml(str) {
