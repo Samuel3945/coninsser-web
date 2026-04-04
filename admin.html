@@ -822,6 +822,68 @@
       font-size: 0.67rem; background: #FEF9C3; color: #854D0E;
       padding: 2px 8px; border-radius: 2px; font-weight: 600;
     }
+    /* ══ TAG INPUT ══ */
+    .tag-input-wrap {
+      border-bottom: 1.5px solid var(--border);
+      padding: 6px 0 4px; min-height: 38px;
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    }
+    .tag-input-wrap:focus-within { border-color: var(--secondary); }
+    .tag-list { display: contents; }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(0,93,183,0.12); color: var(--secondary);
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+      padding: 3px 8px; border-radius: 2px;
+    }
+    .tag-chip button {
+      background: none; border: none; cursor: pointer; color: var(--secondary);
+      font-size: 0.9rem; line-height: 1; padding: 0; margin: 0;
+    }
+    .tag-input-wrap input[type="text"] {
+      border: none; background: none; outline: none; flex: 1; min-width: 160px;
+      font-size: 0.85rem; color: var(--text); padding: 0;
+    }
+    /* ══ PRODUCT CARD PREVIEW ══ */
+    .prod-preview { margin-top: 24px; border-top: 1.5px solid rgba(198,197,212,0.3); padding-top: 20px; }
+    .prod-preview-label {
+      font-size: 0.69rem; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 14px;
+    }
+    .prod-card-preview {
+      border-radius: 2px; overflow: hidden;
+      background: var(--surface-card);
+      box-shadow: 0 2px 16px rgba(26,35,126,0.08);
+      max-width: 260px;
+    }
+    .prod-card-preview__img {
+      height: 140px; background: var(--surface-low);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; overflow: hidden; position: relative;
+    }
+    .prod-card-preview__img img {
+      width: 100%; height: 100%; object-fit: cover;
+      position: absolute; inset: 0;
+    }
+    .prod-card-preview__body { padding: 12px 14px; }
+    .prod-card-preview__cat {
+      font-size: 0.67rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--secondary); margin-bottom: 4px;
+    }
+    .prod-card-preview__name {
+      font-family: var(--font-h); font-size: 0.95rem; font-weight: 700;
+      color: var(--primary); margin-bottom: 6px; line-height: 1.2;
+    }
+    .prod-card-preview__price {
+      font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 2px;
+    }
+    .prod-card-preview__unit {
+      font-size: 0.72rem; color: var(--text-muted);
+    }
+    /* ══ RESENA FIELDS (condicional) ══ */
+    .pf-resena-group {
+      display: contents;
+    }
   </style>
 </head>
 <body>
@@ -927,11 +989,6 @@
               <option value="true">Activos</option>
               <option value="false">Inactivos</option>
             </select>
-            <select id="pf-filter-destacado" onchange="applyPortfolioFilters()">
-              <option value="">Destacados: todos</option>
-              <option value="true">Solo destacados</option>
-              <option value="false">No destacados</option>
-            </select>
           </div>
           <button class="btn btn-add" onclick="openPortfolioCreate()">+ Nuevo proyecto</button>
         </div>
@@ -946,7 +1003,6 @@
               <th>Cliente</th>
               <th>Tipo de trabajo</th>
               <th>Fecha entrega</th>
-              <th style="text-align:center;">Destacado</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -978,7 +1034,7 @@
         <div class="form-grid">
           <div class="form-group full">
             <label for="f-nombre">Nombre *</label>
-            <input type="text" id="f-nombre" placeholder="Nombre del producto" required />
+            <input type="text" id="f-nombre" placeholder="Nombre del producto" required oninput="updateProdPreview()" />
           </div>
           <div class="form-group full">
             <label for="f-descripcion">Descripción</label>
@@ -986,7 +1042,7 @@
           </div>
           <div class="form-group">
             <label for="f-precio-normal">Precio normal *</label>
-            <input type="number" id="f-precio-normal" placeholder="0.00" min="0" step="0.01" required />
+            <input type="number" id="f-precio-normal" placeholder="0.00" min="0" step="0.01" required oninput="updateProdPreview()" />
           </div>
           <div class="form-group full">
             <div class="checkbox-group">
@@ -1008,7 +1064,7 @@
           </div>
           <div class="form-group">
             <label for="f-unidad-medida">Unidad de medida</label>
-            <input type="text" id="f-unidad-medida" placeholder="Ej: unidades, kg, m²" />
+            <input type="text" id="f-unidad-medida" placeholder="Ej: unidades, kg, m²" oninput="updateProdPreview()" />
           </div>
           <div class="form-group">
             <label for="f-stock">Stock</label>
@@ -1016,20 +1072,35 @@
           </div>
           <div class="form-group">
             <label for="f-categoria">Categoría</label>
-            <select id="f-categoria">
+            <select id="f-categoria" onchange="updateProdPreview()">
               <option value="">Sin categoría</option>
             </select>
           </div>
           <div class="form-group full">
             <label for="f-imagen">Imágenes</label>
             <div id="existing-images" class="img-preview-wrap" style="margin-bottom:6px;"></div>
-            <input type="file" id="f-imagen" accept="image/*" multiple onchange="previewNewImages(event)" />
+            <input type="file" id="f-imagen" accept="image/*" multiple onchange="previewNewImages(event); updateProdPreview();" />
             <div id="new-img-previews" class="img-preview-wrap"></div>
           </div>
           <div class="form-group full">
             <div class="checkbox-group">
               <input type="checkbox" id="f-activo" checked />
               <label for="f-activo">Producto activo (visible en la tienda)</label>
+            </div>
+          </div>
+          <!-- Vista previa producto -->
+          <div class="form-group full">
+            <div class="prod-preview">
+              <p class="prod-preview-label">Vista previa de tarjeta</p>
+              <div class="prod-card-preview">
+                <div class="prod-card-preview__img" id="prod-preview-img">📦</div>
+                <div class="prod-card-preview__body">
+                  <p class="prod-card-preview__cat" id="prod-preview-cat">Categoría</p>
+                  <p class="prod-card-preview__name" id="prod-preview-name">Nombre del producto</p>
+                  <p class="prod-card-preview__price" id="prod-preview-price">$ 0.00</p>
+                  <p class="prod-card-preview__unit" id="prod-preview-unit"></p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1094,12 +1165,15 @@
             <textarea id="pf-desc-completa" placeholder="Descripción detallada del proyecto (para el modal del sitio web)" style="min-height:90px;"></textarea>
           </div>
           <div class="form-group full">
-            <label for="pf-resena">Reseña del cliente</label>
-            <textarea id="pf-resena" placeholder="Testimonio u opinión del cliente sobre el trabajo realizado" style="min-height:70px;"></textarea>
+            <label>Servicios realizados <span style="font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">(presiona Enter para agregar)</span></label>
+            <div class="tag-input-wrap" onclick="document.getElementById('pf-servicios-input').focus()">
+              <div id="pf-servicios-list" class="tag-list"></div>
+              <input type="text" id="pf-servicios-input" placeholder="Ej: Concreto hidráulico" onkeydown="addPfServicio(event)" />
+            </div>
           </div>
-          <div class="form-group full">
-            <label for="pf-contacto">Nombre del contacto del cliente</label>
-            <input type="text" id="pf-contacto" placeholder="Ej: Ing. Pedro Gómez" />
+          <div class="form-group">
+            <label for="pf-orden">Orden de aparición</label>
+            <input type="number" id="pf-orden" placeholder="1" min="1" step="1" oninput="updatePfPreview()" />
           </div>
           <div class="form-group full">
             <label for="pf-imagenes">Imágenes del proyecto</label>
@@ -1107,10 +1181,28 @@
             <input type="file" id="pf-imagenes" accept="image/*" multiple onchange="previewPfImages(event)" />
             <div id="pf-new-previews" class="img-preview-wrap"></div>
           </div>
-          <div class="form-group">
+          <div class="form-group full">
             <div class="checkbox-group">
-              <input type="checkbox" id="pf-destacado" onchange="updatePfPreview()" />
-              <label for="pf-destacado">Proyecto destacado (aparece primero en el sitio)</label>
+              <input type="checkbox" id="pf-tiene-resena" onchange="togglePfResena()" />
+              <label for="pf-tiene-resena">¿Este proyecto tiene reseña de cliente?</label>
+            </div>
+          </div>
+          <div id="pf-resena-fields" style="display:none; grid-column:1/-1;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="form-group full" style="grid-column:1/-1;">
+                <label for="pf-resena">Reseña del cliente</label>
+                <textarea id="pf-resena" placeholder="Testimonio u opinión del cliente sobre el trabajo realizado" style="min-height:70px;"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="pf-contacto">Nombre del contacto</label>
+                <input type="text" id="pf-contacto" placeholder="Ej: Ing. Pedro Gómez" />
+              </div>
+              <div class="form-group">
+                <label for="pf-avatar">Avatar del cliente</label>
+                <input type="file" id="pf-avatar" accept="image/*" onchange="previewPfAvatar(event)" />
+                <div id="pf-avatar-existing" style="margin-top:6px;"></div>
+                <img id="pf-avatar-preview" src="" alt="" style="display:none;width:56px;height:56px;object-fit:cover;border-radius:50%;margin-top:6px;" />
+              </div>
             </div>
           </div>
           <div class="form-group">
@@ -1132,7 +1224,6 @@
                   <p class="pf-card-preview__desc" id="pf-preview-desc">Descripción corta del proyecto...</p>
                   <div class="pf-card-preview__footer">
                     <span class="pf-card-preview__ver-mas">Ver más →</span>
-                    <span class="pf-card-preview__destacado" id="pf-preview-destacado" style="display:none;">⭐ Destacado</span>
                   </div>
                 </div>
               </div>
@@ -1511,12 +1602,13 @@
     document.getElementById('new-img-previews').innerHTML = '';
     document.getElementById('f-imagen').value = '';
 
-    openModal();
+    openModal(); // openModal() calls updateProdPreview internally
   }
 
   function markImageForDelete(btn, filename) {
     imagesToDelete.push(filename);
     btn.closest('.existing-img-item').remove();
+    updateProdPreview();
   }
 
   function toggleMayoreoFields() {
@@ -1525,6 +1617,7 @@
   }
 
   function openModal() {
+    updateProdPreview();
     document.getElementById('modal-overlay').classList.add('open');
     document.getElementById('f-nombre').focus();
   }
@@ -1537,6 +1630,30 @@
     document.getElementById('new-img-previews').innerHTML = '';
     document.getElementById('form-error').style.display = 'none';
     imagesToDelete = [];
+  }
+
+  function updateProdPreview() {
+    const nombre = document.getElementById('f-nombre').value || 'Nombre del producto';
+    const precio = parseFloat(document.getElementById('f-precio-normal').value) || 0;
+    const unidad = document.getElementById('f-unidad-medida').value;
+    const catSel = document.getElementById('f-categoria');
+    const catName = catSel.options[catSel.selectedIndex]?.text || 'Categoría';
+
+    document.getElementById('prod-preview-name').textContent  = nombre;
+    document.getElementById('prod-preview-price').textContent = `$ ${precio.toLocaleString('es-CO', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    document.getElementById('prod-preview-unit').textContent  = unidad ? `por ${unidad}` : '';
+    document.getElementById('prod-preview-cat').textContent   = catName === '' ? 'Sin categoría' : catName;
+
+    const imgWrap      = document.getElementById('prod-preview-img');
+    const existingImgs = document.querySelectorAll('#existing-images .existing-img-item img');
+    const newFiles     = document.getElementById('f-imagen').files;
+    if (existingImgs.length > 0) {
+      imgWrap.innerHTML = `<img src="${existingImgs[0].src}" alt="">`;
+    } else if (newFiles && newFiles.length > 0) {
+      imgWrap.innerHTML = `<img src="${URL.createObjectURL(newFiles[0])}" alt="">`;
+    } else {
+      imgWrap.innerHTML = '📦';
+    }
   }
 
   function previewNewImages(event) {
@@ -2006,7 +2123,7 @@
       const { data, error } = await supabaseClient
         .from('portafolio')
         .select('*')
-        .order('destacado', { ascending: false })
+        .order('orden', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
       if (error) throw new Error('Error al cargar el portafolio.');
       allPortfolio = data || [];
@@ -2017,17 +2134,15 @@
   }
 
   function applyPortfolioFilters() {
-    const search     = document.getElementById('pf-search').value.toLowerCase();
-    const tipo       = document.getElementById('pf-filter-tipo').value;
-    const activo     = document.getElementById('pf-filter-activo').value;
-    const destacado  = document.getElementById('pf-filter-destacado').value;
+    const search = document.getElementById('pf-search').value.toLowerCase();
+    const tipo   = document.getElementById('pf-filter-tipo').value;
+    const activo = document.getElementById('pf-filter-activo').value;
 
     filteredPortfolio = allPortfolio.filter(p => {
-      const matchSearch    = !search || (p.titulo || '').toLowerCase().includes(search) || (p.cliente || '').toLowerCase().includes(search);
-      const matchTipo      = !tipo    || p.tipo_trabajo === tipo;
-      const matchActivo    = activo   === '' || String(p.activo)    === activo;
-      const matchDestacado = destacado === '' || String(p.destacado) === destacado;
-      return matchSearch && matchTipo && matchActivo && matchDestacado;
+      const matchSearch = !search || (p.titulo || '').toLowerCase().includes(search) || (p.cliente || '').toLowerCase().includes(search);
+      const matchTipo   = !tipo   || p.tipo_trabajo === tipo;
+      const matchActivo = activo  === '' || String(p.activo) === activo;
+      return matchSearch && matchTipo && matchActivo;
     });
 
     pfCurrentPage = 1;
@@ -2067,7 +2182,6 @@
           <td>${escHtml(p.cliente || '—')}</td>
           <td>${escHtml(p.tipo_trabajo || '—')}</td>
           <td>${fecha}</td>
-          <td style="text-align:center;">${p.destacado ? '⭐' : '—'}</td>
           <td><span class="badge ${p.activo ? 'badge-activo' : 'badge-inactivo'}">${p.activo ? 'Activo' : 'Inactivo'}</span></td>
           <td>
             <div class="actions">
@@ -2130,11 +2244,17 @@
     document.getElementById('pf-form').reset();
     document.getElementById('pf-existing-images').innerHTML = '';
     document.getElementById('pf-new-previews').innerHTML   = '';
-    document.getElementById('pf-activo').checked    = true;
-    document.getElementById('pf-destacado').checked = false;
+    document.getElementById('pf-activo').checked     = true;
+    document.getElementById('pf-tiene-resena').checked = false;
+    document.getElementById('pf-resena-fields').style.display = 'none';
+    document.getElementById('pf-avatar-preview').style.display = 'none';
+    document.getElementById('pf-avatar-existing').innerHTML = '';
     document.getElementById('pf-form-error').style.display = 'none';
     document.getElementById('pf-save-btn').textContent = 'Guardar proyecto';
     document.getElementById('pf-desc-count').textContent = '(0/200)';
+    pfServicios = [];
+    renderPfServicioTags();
+    document.getElementById('pf-servicios-input').value = '';
     pfImagesToDelete = [];
     updatePfPreview();
     document.getElementById('pf-modal-overlay').classList.add('open');
@@ -2153,16 +2273,35 @@
     document.getElementById('pf-ubicacion').value = p.ubicacion || '';
     document.getElementById('pf-fecha').value    = p.fecha_entrega || '';
     document.getElementById('pf-tipo').value     = p.tipo_trabajo  || '';
-    document.getElementById('pf-desc-corta').value      = p.descripcion_corta      || '';
-    document.getElementById('pf-desc-completa').value   = p.descripcion_completa   || '';
-    document.getElementById('pf-resena').value           = p.resena_cliente         || '';
-    document.getElementById('pf-contacto').value         = p.nombre_contacto_cliente || '';
-    document.getElementById('pf-activo').checked    = !!p.activo;
-    document.getElementById('pf-destacado').checked = !!p.destacado;
+    document.getElementById('pf-desc-corta').value    = p.descripcion_corta    || '';
+    document.getElementById('pf-desc-completa').value = p.descripcion_completa || '';
+    document.getElementById('pf-orden').value         = p.orden || '';
+    document.getElementById('pf-activo').checked = !!p.activo;
     document.getElementById('pf-form-error').style.display = 'none';
     document.getElementById('pf-save-btn').textContent = 'Guardar cambios';
     updatePfDescCount();
 
+    // Servicios tags
+    pfServicios = Array.isArray(p.servicios) ? [...p.servicios] : [];
+    renderPfServicioTags();
+    document.getElementById('pf-servicios-input').value = '';
+
+    // Review condicional
+    const tieneResena = !!p.tiene_resena;
+    document.getElementById('pf-tiene-resena').checked = tieneResena;
+    document.getElementById('pf-resena-fields').style.display = tieneResena ? 'block' : 'none';
+    document.getElementById('pf-resena').value   = p.resena_cliente          || '';
+    document.getElementById('pf-contacto').value = p.nombre_contacto_cliente || '';
+    document.getElementById('pf-avatar').value   = '';
+    document.getElementById('pf-avatar-preview').style.display = 'none';
+    const avatarExisting = document.getElementById('pf-avatar-existing');
+    if (p.avatar_resena) {
+      avatarExisting.innerHTML = `<img src="${escHtml(p.avatar_resena)}" alt="Avatar" style="width:56px;height:56px;object-fit:cover;border-radius:50%;margin-top:4px;" />`;
+    } else {
+      avatarExisting.innerHTML = '';
+    }
+
+    // Imágenes existentes
     const imagenes = Array.isArray(p.imagenes) ? p.imagenes : [];
     const wrap = document.getElementById('pf-existing-images');
     wrap.innerHTML = '';
@@ -2219,8 +2358,6 @@
     document.getElementById('pf-preview-cliente').textContent = document.getElementById('pf-cliente').value    || 'Cliente';
     document.getElementById('pf-preview-tipo').textContent    = document.getElementById('pf-tipo').value       || 'Tipo de trabajo';
     document.getElementById('pf-preview-desc').textContent    = document.getElementById('pf-desc-corta').value || 'Descripción corta del proyecto...';
-    const destacado = document.getElementById('pf-destacado').checked;
-    document.getElementById('pf-preview-destacado').style.display = destacado ? 'inline-block' : 'none';
 
     // Imagen en preview
     const imgWrap      = document.getElementById('pf-preview-img');
@@ -2233,6 +2370,59 @@
     } else {
       imgWrap.innerHTML = '🏗️';
     }
+  }
+
+  function togglePfResena() {
+    const show = document.getElementById('pf-tiene-resena').checked;
+    document.getElementById('pf-resena-fields').style.display = show ? 'block' : 'none';
+    if (!show) {
+      document.getElementById('pf-resena').value   = '';
+      document.getElementById('pf-contacto').value = '';
+      document.getElementById('pf-avatar').value   = '';
+      document.getElementById('pf-avatar-preview').style.display = 'none';
+      document.getElementById('pf-avatar-existing').innerHTML = '';
+    }
+  }
+
+  function previewPfAvatar(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('pf-avatar-preview');
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  // ── Servicios tags ──
+  let pfServicios = [];
+
+  function renderPfServicioTags() {
+    const list = document.getElementById('pf-servicios-list');
+    list.innerHTML = '';
+    pfServicios.forEach((tag, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `${escHtml(tag)}<button type="button" onclick="removePfServicio(${i})">&#x2715;</button>`;
+      list.appendChild(chip);
+    });
+  }
+
+  function addPfServicio(event) {
+    if (event.key !== 'Enter' && event.key !== ',') return;
+    event.preventDefault();
+    const input = document.getElementById('pf-servicios-input');
+    const val   = input.value.trim();
+    if (!val || pfServicios.includes(val)) { input.value = ''; return; }
+    pfServicios.push(val);
+    input.value = '';
+    renderPfServicioTags();
+  }
+
+  function removePfServicio(index) {
+    pfServicios.splice(index, 1);
+    renderPfServicioTags();
   }
 
   async function savePortfolio() {
@@ -2273,6 +2463,19 @@
 
       const allImageUrls = [...remainingUrls, ...newUrls];
 
+      // Upload avatar if provided
+      let avatarUrl = null;
+      const avatarFile = document.getElementById('pf-avatar').files[0];
+      if (avatarFile) {
+        const avatarPath = `avatares/${Date.now()}_${avatarFile.name}`;
+        const { error: avatarErr } = await supabaseClient.storage.from(PF_BUCKET).upload(avatarPath, avatarFile);
+        if (!avatarErr) {
+          const { data: avatarData } = supabaseClient.storage.from(PF_BUCKET).getPublicUrl(avatarPath);
+          avatarUrl = avatarData.publicUrl;
+        }
+      }
+
+      const tieneResena = document.getElementById('pf-tiene-resena').checked;
       const projectData = {
         titulo,
         cliente:                  document.getElementById('pf-cliente').value,
@@ -2281,10 +2484,13 @@
         tipo_trabajo:             document.getElementById('pf-tipo').value,
         descripcion_corta:        document.getElementById('pf-desc-corta').value,
         descripcion_completa:     document.getElementById('pf-desc-completa').value,
-        resena_cliente:           document.getElementById('pf-resena').value,
-        nombre_contacto_cliente:  document.getElementById('pf-contacto').value,
+        servicios:                pfServicios,
+        orden:                    parseInt(document.getElementById('pf-orden').value) || null,
+        tiene_resena:             tieneResena,
+        resena_cliente:           tieneResena ? document.getElementById('pf-resena').value : null,
+        nombre_contacto_cliente:  tieneResena ? document.getElementById('pf-contacto').value : null,
+        avatar_resena:            tieneResena ? (avatarUrl || (id ? (allPortfolio.find(x=>x.id===id)?.avatar_resena || null) : null)) : null,
         imagenes:                 allImageUrls,
-        destacado:                document.getElementById('pf-destacado').checked,
         activo:                   document.getElementById('pf-activo').checked,
       };
 

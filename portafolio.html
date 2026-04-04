@@ -8,6 +8,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const supabaseClient = supabase.createClient(
+      'https://slsjaomaicjbrnzyxela.supabase.co',
+      'sb_publishable_zGd4ohnKJY7vcTmAf6kU1A__477ERHQ'
+    );
+  </script>
 </head>
 <body>
 
@@ -45,7 +52,7 @@
 </header>
 
 
-<!-- ══ PROYECTOS DESTACADOS ══ -->
+<!-- ══ PROYECTOS ══ -->
 <section class="section">
   <div class="container">
 
@@ -55,114 +62,13 @@
       <p class="subtitle" style="margin-top:12px">Descripción de los principales proyectos ejecutados por CONINSSER.</p>
     </div>
 
-    <!-- Proyecto 1: Construcción de vías -->
-    <div class="project-block reveal">
-      <div class="project-block__img">
-        <img src="img/coninsser_via_01.jpg" alt="Construcción de vía en concreto hidráulico — CONINSSER">
-      </div>
-      <div>
-        <span class="project-block__client">Desco SAS — A3 Internacional</span>
-        <h2 class="project-block__title">Construcción de Vías en Concreto Hidráulico</h2>
-        <p class="project-block__desc">
-          Ejecución de vías en concreto hidráulico para zonas industriales y residenciales en
-          Cartagena de Indias. El trabajo incluyó excavación, subbase granular compactada,
-          encofrado y vaciado de losas de concreto de 3.000 PSI con juntas de dilatación
-          debidamente selladas.
-        </p>
-        <p class="project-block__desc">
-          Las vías cumplen con los estándares técnicos de diseño estructural para soportar
-          carga vehicular pesada, garantizando una vida útil superior a 20 años con
-          mantenimiento mínimo.
-        </p>
-        <div class="project-block__tags">
-          <span class="p-tag">Construcción Civil</span>
-          <span class="p-tag">Vías en Concreto</span>
-          <span class="p-tag">Obras Industriales</span>
-        </div>
-      </div>
+    <!-- Estado de carga -->
+    <div id="pf-loading" style="text-align:center;padding:60px 0;">
+      <p style="color:#666;font-size:1rem;">Cargando proyectos...</p>
     </div>
 
-    <!-- Proyecto 2: Cubierta metálica industrial -->
-    <div class="project-block project-block--rev reveal">
-      <div class="project-block__img">
-        <img src="img/coninsser_techo_01.jpg" alt="Cubierta metálica industrial — Taller La Sierra">
-      </div>
-      <div>
-        <span class="project-block__client">Taller Industrial La Sierra</span>
-        <h2 class="project-block__title">Cubierta Metálica para Taller Industrial</h2>
-        <p class="project-block__desc">
-          Diseño, fabricación e instalación de cubierta metálica sobre estructura existente
-          del Taller Industrial La Sierra. Se instalaron perlines metálicos, correas y
-          lámina de zinc-alum calibre 26 con translúcidos para iluminación natural.
-        </p>
-        <p class="project-block__desc">
-          El proyecto incluyó el sellado perimetral, instalación de canales recolectoras
-          de aguas lluvias y bajantes. La obra se ejecutó sin interrumpir las operaciones
-          del taller, trabajando en horarios acordados con el cliente.
-        </p>
-        <div class="project-block__tags">
-          <span class="p-tag">Cubiertas Metálicas</span>
-          <span class="p-tag">Estructuras en Acero</span>
-          <span class="p-tag">Industrial</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Proyecto 3: Conjunto Residencial Burano -->
-    <div class="project-block reveal">
-      <div class="project-block__img">
-        <img src="img/coninsser_construccion_01.jpg" alt="Conjunto Residencial Burano — CONINSSER">
-      </div>
-      <div>
-        <span class="project-block__client">Conjunto Residencial Burano</span>
-        <h2 class="project-block__title">Obras Civiles e Instalaciones Técnicas</h2>
-        <p class="project-block__desc">
-          Ejecución de obras civiles complementarias y redes técnicas para el
-          Conjunto Residencial Burano. Los trabajos abarcaron la construcción de vías
-          internas en concreto, andenes peatonales, zonas comunes y la instalación
-          de redes hidráulico-sanitarias exteriores.
-        </p>
-        <p class="project-block__desc">
-          Adicionalmente se instalaron las acometidas eléctricas y redes de gas natural
-          para las unidades residenciales, cumpliendo con toda la normativa técnica
-          vigente para proyectos de vivienda en Colombia.
-        </p>
-        <div class="project-block__tags">
-          <span class="p-tag">Construcción Civil</span>
-          <span class="p-tag">Redes Hidráulicas</span>
-          <span class="p-tag">Instalaciones Eléctricas</span>
-          <span class="p-tag">Gas Natural</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Proyecto 4: Zinnia Club House -->
-    <div class="project-block project-block--rev reveal">
-      <div class="project-block__img">
-        <img src="img/coninsser_construccion_02.jpg" alt="Zinnia Club House P.H. — CONINSSER">
-      </div>
-      <div>
-        <span class="project-block__client">Zinnia Club House P.H.</span>
-        <h2 class="project-block__title">Adecuación y Construcción Club House — Penthouse</h2>
-        <p class="project-block__desc">
-          Construcción y adecuación integral de las zonas comunes del Club House y
-          Penthouse de Zinnia. La obra comprendió actividades de obra blanca, acabados
-          en pisos y muros, cielos rasos, instalación de redes eléctricas y sistema
-          de iluminación especializado.
-        </p>
-        <p class="project-block__desc">
-          Se realizaron también obras de impermeabilización en terrazas y la instalación
-          de sistemas hidrosanitarios para las áreas sociales. El proyecto se entregó
-          con acabados de alta especificación acorde a las exigencias del cliente.
-        </p>
-        <div class="project-block__tags">
-          <span class="p-tag">Obra Civil</span>
-          <span class="p-tag">Acabados</span>
-          <span class="p-tag">Instalaciones Técnicas</span>
-          <span class="p-tag">Impermeabilización</span>
-        </div>
-      </div>
-    </div>
+    <!-- Contenedor dinámico -->
+    <div id="pf-projects"></div>
 
   </div>
 </section>
@@ -230,5 +136,91 @@
 </div>
 
 <script src="js/main.js"></script>
+<script>
+  async function loadPortfolio() {
+    const loading = document.getElementById('pf-loading');
+    const container = document.getElementById('pf-projects');
+
+    try {
+      const { data: projects, error } = await supabaseClient
+        .from('portafolio')
+        .select('*')
+        .eq('activo', true)
+        .order('orden', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      loading.style.display = 'none';
+
+      if (!projects || projects.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#666;padding:40px 0;">No hay proyectos disponibles en este momento.</p>';
+        return;
+      }
+
+      container.innerHTML = projects.map((p, i) => {
+        const isReversed = i % 2 !== 0;
+        const reverseClass = isReversed ? ' project-block--rev' : '';
+
+        const imagenes = Array.isArray(p.imagenes) ? p.imagenes : [];
+        const imgSrc = imagenes.length > 0 ? imagenes[0] : '';
+        const imgHtml = imgSrc
+          ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(p.titulo || '')}">`
+          : `<div style="width:100%;height:100%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:3rem;">🏗️</div>`;
+
+        const servicios = Array.isArray(p.servicios) ? p.servicios : [];
+        const tagsHtml = servicios.length > 0
+          ? servicios.map(s => `<span class="p-tag">${escHtml(s)}</span>`).join('')
+          : (p.tipo_trabajo ? `<span class="p-tag">${escHtml(p.tipo_trabajo)}</span>` : '');
+
+        const resenaHtml = p.tiene_resena && p.resena_cliente ? `
+          <blockquote class="project-block__quote">
+            ${p.avatar_resena ? `<img src="${escHtml(p.avatar_resena)}" alt="${escHtml(p.nombre_contacto_cliente || '')}" class="project-block__avatar">` : ''}
+            <p>"${escHtml(p.resena_cliente)}"</p>
+            ${p.nombre_contacto_cliente ? `<cite>— ${escHtml(p.nombre_contacto_cliente)}</cite>` : ''}
+          </blockquote>` : '';
+
+        const desc2Html = p.descripcion_completa
+          ? `<p class="project-block__desc">${escHtml(p.descripcion_completa)}</p>`
+          : '';
+
+        return `
+          <div class="project-block${reverseClass} reveal">
+            <div class="project-block__img">
+              ${imgHtml}
+            </div>
+            <div>
+              ${p.cliente ? `<span class="project-block__client">${escHtml(p.cliente)}</span>` : ''}
+              <h2 class="project-block__title">${escHtml(p.titulo || '')}</h2>
+              ${p.descripcion_corta ? `<p class="project-block__desc">${escHtml(p.descripcion_corta)}</p>` : ''}
+              ${desc2Html}
+              ${resenaHtml}
+              ${tagsHtml ? `<div class="project-block__tags">${tagsHtml}</div>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+
+      // Trigger reveal animations if main.js exposes them
+      if (typeof initReveal === 'function') initReveal();
+
+    } catch (err) {
+      loading.style.display = 'none';
+      container.innerHTML = '<p style="text-align:center;color:#666;padding:40px 0;">Error al cargar los proyectos. Por favor intente más tarde.</p>';
+      console.error('Error cargando portafolio:', err);
+    }
+  }
+
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  loadPortfolio();
+</script>
 </body>
 </html>
