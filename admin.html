@@ -976,17 +976,8 @@
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <div class="filters">
             <input type="text" id="pf-search" placeholder="Buscar por título o cliente..." oninput="applyPortfolioFilters()" />
-            <select id="pf-filter-tipo" onchange="applyPortfolioFilters()">
-              <option value="">Todos los tipos</option>
-              <option>Construcción</option>
-              <option>Instalación Eléctrica</option>
-              <option>Instalación Hidráulica</option>
-              <option>Gas</option>
-              <option>Energía Solar</option>
-              <option>CCTV</option>
-              <option>Mantenimiento</option>
-              <option>Movimiento de Tierras</option>
-              <option>Otro</option>
+            <select id="pf-filter-servicio" onchange="applyPortfolioFilters()">
+              <option value="">Todos los servicios</option>
             </select>
             <select id="pf-filter-activo" onchange="applyPortfolioFilters()">
               <option value="">Todos</option>
@@ -1005,7 +996,7 @@
               <th>Imagen</th>
               <th>Título</th>
               <th>Cliente</th>
-              <th>Tipo de trabajo</th>
+              <th>Servicios</th>
               <th>Fecha entrega</th>
               <th>Estado</th>
               <th>Acciones</th>
@@ -1145,21 +1136,6 @@
             <label for="pf-fecha">Fecha de entrega</label>
             <input type="date" id="pf-fecha" />
           </div>
-          <div class="form-group">
-            <label for="pf-tipo">Tipo de trabajo</label>
-            <select id="pf-tipo" onchange="updatePfPreview()">
-              <option value="">Seleccionar...</option>
-              <option>Construcción</option>
-              <option>Instalación Eléctrica</option>
-              <option>Instalación Hidráulica</option>
-              <option>Gas</option>
-              <option>Energía Solar</option>
-              <option>CCTV</option>
-              <option>Mantenimiento</option>
-              <option>Movimiento de Tierras</option>
-              <option>Otro</option>
-            </select>
-          </div>
           <div class="form-group full">
             <label for="pf-desc-corta">Descripción corta * <span id="pf-desc-count" style="font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">(0/200)</span></label>
             <textarea id="pf-desc-corta" placeholder="Resumen visible en la tarjeta del sitio web" maxlength="200" oninput="updatePfDescCount()" style="min-height:60px;"></textarea>
@@ -1176,22 +1152,7 @@
                 <span class="servicios-arrow">▾</span>
               </button>
               <div class="servicios-panel" id="pf-servicios-panel">
-                <label class="svc-opt"><input type="checkbox" value="Construcción Civil" onchange="updateServiciosSummary()"> Construcción Civil</label>
-                <label class="svc-opt"><input type="checkbox" value="Vías en Concreto" onchange="updateServiciosSummary()"> Vías en Concreto</label>
-                <label class="svc-opt"><input type="checkbox" value="Cubiertas Metálicas" onchange="updateServiciosSummary()"> Cubiertas Metálicas</label>
-                <label class="svc-opt"><input type="checkbox" value="Estructuras en Acero" onchange="updateServiciosSummary()"> Estructuras en Acero</label>
-                <label class="svc-opt"><input type="checkbox" value="Instalaciones Eléctricas" onchange="updateServiciosSummary()"> Instalaciones Eléctricas</label>
-                <label class="svc-opt"><input type="checkbox" value="Instalaciones Hidráulicas" onchange="updateServiciosSummary()"> Instalaciones Hidráulicas</label>
-                <label class="svc-opt"><input type="checkbox" value="Gas Natural" onchange="updateServiciosSummary()"> Gas Natural</label>
-                <label class="svc-opt"><input type="checkbox" value="Redes Sanitarias" onchange="updateServiciosSummary()"> Redes Sanitarias</label>
-                <label class="svc-opt"><input type="checkbox" value="Energía Solar" onchange="updateServiciosSummary()"> Energía Solar</label>
-                <label class="svc-opt"><input type="checkbox" value="CCTV y Seguridad" onchange="updateServiciosSummary()"> CCTV y Seguridad</label>
-                <label class="svc-opt"><input type="checkbox" value="Impermeabilización" onchange="updateServiciosSummary()"> Impermeabilización</label>
-                <label class="svc-opt"><input type="checkbox" value="Acabados" onchange="updateServiciosSummary()"> Acabados</label>
-                <label class="svc-opt"><input type="checkbox" value="Movimiento de Tierras" onchange="updateServiciosSummary()"> Movimiento de Tierras</label>
-                <label class="svc-opt"><input type="checkbox" value="Mantenimiento Integral" onchange="updateServiciosSummary()"> Mantenimiento Integral</label>
-                <label class="svc-opt"><input type="checkbox" value="Obras Industriales" onchange="updateServiciosSummary()"> Obras Industriales</label>
-                <label class="svc-opt"><input type="checkbox" value="Asesoría Jurídica" onchange="updateServiciosSummary()"> Asesoría Jurídica</label>
+                <span class="svc-opt" style="color:var(--text-muted);font-style:italic;">Cargando servicios...</span>
               </div>
             </div>
           </div>
@@ -1381,6 +1342,7 @@
   function showApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
+    loadServicios();
     loadCategories().then(() => loadProducts());
   }
 
@@ -2142,35 +2104,75 @@
     document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
     if (tab === 'portafolio' && !portfolioLoaded) {
       portfolioLoaded = true;
-      loadPortfolio();
+      loadServicios().then(() => loadPortfolio());
     }
   }
 
   // ======== PORTAFOLIO ========
 
   const PF_BUCKET = 'portafolio-imagenes';
-  let allPortfolio       = [];
-  let filteredPortfolio  = [];
+  let allPortfolio      = [];
+  let filteredPortfolio = [];
+  let allServicios      = [];
   let pfCurrentPage      = 1;
   const PF_PAGE_SIZE     = 10;
   let pfImagesToDelete   = [];
+
+  async function loadServicios() {
+    const { data } = await supabaseClient
+      .from('servicios')
+      .select('id, nombre, icono, orden')
+      .eq('activo', true)
+      .order('orden');
+    allServicios = data || [];
+    renderServiciosPanel();
+    populatePfFilterServicio();
+  }
+
+  function renderServiciosPanel() {
+    const panel = document.getElementById('pf-servicios-panel');
+    if (!allServicios.length) {
+      panel.innerHTML = '<span class="svc-opt" style="color:var(--text-muted);font-style:italic;">No hay servicios disponibles.</span>';
+      return;
+    }
+    panel.innerHTML = allServicios.map(s => `
+      <label class="svc-opt">
+        <input type="checkbox" value="${s.id}" data-nombre="${escHtml(s.nombre)}" onchange="updateServiciosSummary()">
+        ${s.icono ? escHtml(s.icono) + ' ' : ''}${escHtml(s.nombre)}
+      </label>`).join('');
+  }
+
+  function populatePfFilterServicio() {
+    const sel = document.getElementById('pf-filter-servicio');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Todos los servicios</option>' +
+      allServicios.map(s => `<option value="${s.id}">${escHtml(s.nombre)}</option>`).join('');
+    sel.value = current;
+  }
 
   async function loadPortfolio() {
     setPfTableState('loading');
     try {
       const { data, error } = await supabaseClient
         .from('portafolio')
-        .select('*')
+        .select('*, portafolio_servicios(servicio_id, servicios(id, nombre, icono, orden))')
         .order('created_at', { ascending: false });
-      if (error) throw new Error('Error al cargar el portafolio.');
-      // Sort by orden client-side (column may not exist yet)
-      allPortfolio = (data || []).slice().sort((a, b) => {
+      if (error) throw new Error('Error al cargar el portafolio: ' + error.message);
+
+      allPortfolio = (data || []).map(p => ({
+        ...p,
+        _servicios: (p.portafolio_servicios || [])
+          .map(ps => ps.servicios)
+          .filter(Boolean)
+          .sort((a, b) => (a.orden || 0) - (b.orden || 0))
+      })).sort((a, b) => {
         const ao = a.orden ?? null, bo = b.orden ?? null;
         if (ao !== null && bo !== null) return ao - bo;
         if (ao !== null) return -1;
         if (bo !== null) return 1;
         return 0;
       });
+
       applyPortfolioFilters();
     } catch (err) {
       setPfTableState('error', err.message);
@@ -2178,15 +2180,15 @@
   }
 
   function applyPortfolioFilters() {
-    const search = document.getElementById('pf-search').value.toLowerCase();
-    const tipo   = document.getElementById('pf-filter-tipo').value;
-    const activo = document.getElementById('pf-filter-activo').value;
+    const search   = document.getElementById('pf-search').value.toLowerCase();
+    const servicio = document.getElementById('pf-filter-servicio').value;
+    const activo   = document.getElementById('pf-filter-activo').value;
 
     filteredPortfolio = allPortfolio.filter(p => {
-      const matchSearch = !search || (p.titulo || '').toLowerCase().includes(search) || (p.cliente || '').toLowerCase().includes(search);
-      const matchTipo   = !tipo   || p.tipo_trabajo === tipo;
-      const matchActivo = activo  === '' || String(p.activo) === activo;
-      return matchSearch && matchTipo && matchActivo;
+      const matchSearch   = !search   || (p.titulo || '').toLowerCase().includes(search) || (p.cliente || '').toLowerCase().includes(search);
+      const matchServicio = !servicio || (p._servicios || []).some(s => s.id === servicio);
+      const matchActivo   = activo === '' || String(p.activo) === activo;
+      return matchSearch && matchServicio && matchActivo;
     });
 
     pfCurrentPage = 1;
@@ -2224,7 +2226,7 @@
           <td>${imgHtml}</td>
           <td><strong>${escHtml(p.titulo)}</strong></td>
           <td>${escHtml(p.cliente || '—')}</td>
-          <td>${escHtml(p.tipo_trabajo || '—')}</td>
+          <td>${p._servicios && p._servicios.length ? p._servicios.map(s => `<span class="badge badge-activo" style="margin:1px 2px;font-size:0.65rem;">${escHtml(s.nombre)}</span>`).join('') : '—'}</td>
           <td>${fecha}</td>
           <td><span class="badge ${p.activo ? 'badge-activo' : 'badge-inactivo'}">${p.activo ? 'Activo' : 'Inactivo'}</span></td>
           <td>
@@ -2314,7 +2316,6 @@
     document.getElementById('pf-cliente').value  = p.cliente || '';
     document.getElementById('pf-ubicacion').value = p.ubicacion || '';
     document.getElementById('pf-fecha').value    = p.fecha_entrega || '';
-    document.getElementById('pf-tipo').value     = p.tipo_trabajo  || '';
     document.getElementById('pf-desc-corta').value    = p.descripcion_corta    || '';
     document.getElementById('pf-desc-completa').value = p.descripcion_completa || '';
     document.getElementById('pf-orden').value         = p.orden || '';
@@ -2323,8 +2324,8 @@
     document.getElementById('pf-save-btn').textContent = 'Guardar cambios';
     updatePfDescCount();
 
-    // Servicios dropdown
-    setPfServicios(Array.isArray(p.servicios) ? p.servicios : []);
+    // Servicios dropdown — usar IDs de la relación cargada
+    setPfServicios((p._servicios || []).map(s => s.id));
 
     // Review condicional
     const tieneResena = !!p.tiene_resena;
@@ -2396,7 +2397,8 @@
   function updatePfPreview() {
     document.getElementById('pf-preview-titulo').textContent  = document.getElementById('pf-titulo').value     || 'Título del proyecto';
     document.getElementById('pf-preview-cliente').textContent = document.getElementById('pf-cliente').value    || 'Cliente';
-    document.getElementById('pf-preview-tipo').textContent    = document.getElementById('pf-tipo').value       || 'Tipo de trabajo';
+    const firstChecked = document.querySelector('#pf-servicios-panel input[type="checkbox"]:checked');
+    document.getElementById('pf-preview-tipo').textContent = firstChecked ? firstChecked.dataset.nombre : 'Servicios realizados';
     document.getElementById('pf-preview-desc').textContent    = document.getElementById('pf-desc-corta').value || 'Descripción corta del proyecto...';
 
     // Imagen en preview
@@ -2446,22 +2448,23 @@
   function updateServiciosSummary() {
     const checked = Array.from(
       document.querySelectorAll('#pf-servicios-panel input[type="checkbox"]:checked')
-    ).map(cb => cb.value);
-    const summary = document.getElementById('pf-servicios-summary');
-    summary.textContent = checked.length > 0
-      ? checked.join(', ')
-      : 'Seleccionar servicios...';
+    ).map(cb => cb.dataset.nombre);
+    document.getElementById('pf-servicios-summary').textContent =
+      checked.length > 0 ? checked.join(', ') : 'Seleccionar servicios...';
+    updatePfPreview();
   }
 
+  // Returns array of servicio UUIDs
   function getPfServicios() {
     return Array.from(
       document.querySelectorAll('#pf-servicios-panel input[type="checkbox"]:checked')
     ).map(cb => cb.value);
   }
 
-  function setPfServicios(values) {
-    const checkboxes = document.querySelectorAll('#pf-servicios-panel input[type="checkbox"]');
-    checkboxes.forEach(cb => { cb.checked = values.includes(cb.value); });
+  // Accepts array of servicio UUIDs
+  function setPfServicios(ids) {
+    document.querySelectorAll('#pf-servicios-panel input[type="checkbox"]')
+      .forEach(cb => { cb.checked = ids.includes(cb.value); });
     updateServiciosSummary();
   }
 
@@ -2532,10 +2535,8 @@
         cliente:                  document.getElementById('pf-cliente').value,
         ubicacion:                document.getElementById('pf-ubicacion').value,
         fecha_entrega:            document.getElementById('pf-fecha').value || null,
-        tipo_trabajo:             document.getElementById('pf-tipo').value,
         descripcion_corta:        document.getElementById('pf-desc-corta').value,
         descripcion_completa:     document.getElementById('pf-desc-completa').value,
-        servicios:                getPfServicios(),
         orden:                    parseInt(document.getElementById('pf-orden').value) || null,
         tiene_resena:             tieneResena,
         resena_cliente:           tieneResena ? document.getElementById('pf-resena').value : null,
@@ -2545,14 +2546,25 @@
         activo:                   document.getElementById('pf-activo').checked,
       };
 
-      let error;
+      let pfId = id;
       if (id) {
-        ({ error } = await supabaseClient.from('portafolio').update(projectData).eq('id', id));
+        const { error } = await supabaseClient.from('portafolio').update(projectData).eq('id', id);
+        if (error) throw new Error(error.message || 'Error al actualizar.');
       } else {
-        ({ error } = await supabaseClient.from('portafolio').insert(projectData));
+        const { data: inserted, error } = await supabaseClient.from('portafolio').insert(projectData).select('id').single();
+        if (error) throw new Error(error.message || 'Error al crear.');
+        pfId = inserted.id;
       }
 
-      if (error) throw new Error(error.message || 'Error al guardar.');
+      // Sincronizar servicios en la tabla junction
+      const selectedIds = getPfServicios();
+      await supabaseClient.from('portafolio_servicios').delete().eq('portafolio_id', pfId);
+      if (selectedIds.length > 0) {
+        const { error: svcErr } = await supabaseClient.from('portafolio_servicios').insert(
+          selectedIds.map(sid => ({ portafolio_id: pfId, servicio_id: sid }))
+        );
+        if (svcErr) throw new Error('Error al guardar servicios: ' + svcErr.message);
+      }
 
       await loadPortfolio();
       closePfModal();

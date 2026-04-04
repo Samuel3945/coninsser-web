@@ -142,11 +142,10 @@
     const container = document.getElementById('pf-projects');
 
     try {
-      // Fetch active projects — also accept activo IS NULL for legacy records
+      // Usar la vista que ya incluye servicios con nombre e ícono
       const { data: raw, error } = await supabaseClient
-        .from('portafolio')
+        .from('portafolio_con_servicios')
         .select('*')
-        .or('activo.eq.true,activo.is.null')
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -181,10 +180,11 @@
           ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(p.titulo || '')}">`
           : `<div style="width:100%;height:100%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:3rem;">🏗️</div>`;
 
-        const servicios = parseImages(p.servicios); // reuses same safe-parse logic
-        const tagsHtml = servicios.length > 0
-          ? servicios.map(s => `<span class="p-tag">${escHtml(s)}</span>`).join('')
-          : (p.tipo_trabajo ? `<span class="p-tag">${escHtml(p.tipo_trabajo)}</span>` : '');
+        // servicios_detalle viene de la vista como array JSON [{id, nombre, icono}]
+        const servicios = Array.isArray(p.servicios_detalle) ? p.servicios_detalle : [];
+        const tagsHtml = servicios.map(s =>
+          `<span class="p-tag">${s.icono ? escHtml(s.icono) + ' ' : ''}${escHtml(s.nombre)}</span>`
+        ).join('');
 
         const resenaHtml = p.tiene_resena && p.resena_cliente ? `
           <blockquote class="project-block__quote">
