@@ -213,8 +213,14 @@
           </div>`;
       }).join('');
 
-      // Trigger reveal animations if main.js exposes them
-      if (typeof initReveal === 'function') initReveal();
+      // Re-observe dynamically injected .reveal elements
+      const newRevealEls = document.querySelectorAll('#pf-projects .reveal');
+      if (typeof revealObs !== 'undefined') {
+        newRevealEls.forEach(el => revealObs.observe(el));
+      } else {
+        // Fallback: make them visible immediately
+        newRevealEls.forEach(el => el.classList.add('visible'));
+      }
 
     } catch (err) {
       loading.style.display = 'none';
