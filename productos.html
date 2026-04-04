@@ -835,16 +835,13 @@ function renderCategorias() {
     const count = allProductos.filter(p => p.categoria_id === cat.id).length;
 
     const hasImg = cat.img && cat.img.length > 0;
-    const imgSrc = hasImg ? cat.img : '';
-    const icono  = cat.icono || '📦';
 
     if (hasImg) {
       return `
         <div class="cat-card" onclick="showProductos('${cat.id}', '${escHtml(cat.nombre)}')">
-          <img class="cat-card__bg" src="${imgSrc}" alt="${escHtml(cat.nombre)}" loading="lazy">
+          <img class="cat-card__bg" src="${cat.img}" alt="${escHtml(cat.nombre)}" loading="lazy">
           <div class="cat-card__overlay"></div>
           <div class="cat-card__body">
-            <span class="cat-card__emoji">${icono}</span>
             <p class="cat-card__name">${escHtml(cat.nombre)}</p>
             <span class="cat-card__count">${count} producto${count !== 1 ? 's' : ''}</span>
           </div>
@@ -852,7 +849,6 @@ function renderCategorias() {
     } else {
       return `
         <div class="cat-card cat-card--no-img" onclick="showProductos('${cat.id}', '${escHtml(cat.nombre)}')">
-          <div class="cat-card__emoji-center">${icono}</div>
           <div class="cat-card__body">
             <p class="cat-card__name">${escHtml(cat.nombre)}</p>
             <span class="cat-card__count">${count} producto${count !== 1 ? 's' : ''}</span>

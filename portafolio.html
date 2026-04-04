@@ -182,9 +182,7 @@
 
         // servicios_detalle viene de la vista como array JSON [{id, nombre, icono}]
         const servicios = Array.isArray(p.servicios_detalle) ? p.servicios_detalle : [];
-        const tagsHtml = servicios.map(s =>
-          `<span class="p-tag">${s.icono ? escHtml(s.icono) + ' ' : ''}${escHtml(s.nombre)}</span>`
-        ).join('');
+        const tagsHtml = servicios.map(s => `<span class="p-tag">${escHtml(s.nombre)}</span>`).join('');
 
         const resenaHtml = p.tiene_resena && p.resena_cliente ? `
           <blockquote class="project-block__quote">

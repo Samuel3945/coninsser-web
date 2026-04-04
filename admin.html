@@ -617,13 +617,6 @@
 
     .cat-field-row { display: flex; gap: 10px; margin-bottom: 12px; }
 
-    .cat-input-icono {
-      width: 64px; flex-shrink: 0;
-      padding: 8px 0; border: none;
-      border-bottom: 1.5px solid #D1D5DB;
-      background: transparent; font-size: 1.1rem;
-      text-align: center; outline: none; transition: border-color 0.2s;
-    }
     .cat-input-nombre {
       flex: 1; padding: 8px 0; border: none;
       border-bottom: 1.5px solid #D1D5DB;
@@ -637,7 +630,6 @@
       font-family: var(--font-b); outline: none;
       resize: vertical; margin-bottom: 12px; transition: border-color 0.2s;
     }
-    .cat-input-icono:focus,
     .cat-input-nombre:focus,
     .cat-input-descripcion:focus { border-bottom-color: var(--secondary); }
 
@@ -1238,7 +1230,6 @@
       <div class="cat-add-form">
         <label class="cat-form-label" id="cat-form-title">Nueva categoría</label>
         <div class="cat-field-row">
-          <input type="text" class="cat-input-icono" id="cat-icono" placeholder="🧱" maxlength="4" />
           <input type="text" class="cat-input-nombre" id="cat-nombre" placeholder="Nombre de la categoría" />
         </div>
         <textarea class="cat-input-descripcion" id="cat-descripcion" placeholder="Descripción (opcional)" rows="2"></textarea>
@@ -1365,7 +1356,7 @@
     allCategories.forEach(c => {
       const opt = document.createElement('option');
       opt.value = c.id;
-      opt.textContent = (c.icono ? c.icono + ' ' : '') + c.nombre;
+      opt.textContent = c.nombre;
       if (c.id === filterVal) opt.selected = true;
       filterSel.appendChild(opt);
     });
@@ -1377,7 +1368,7 @@
     allCategories.forEach(c => {
       const opt = document.createElement('option');
       opt.value = c.id;
-      opt.textContent = (c.icono ? c.icono + ' ' : '') + c.nombre;
+      opt.textContent = c.nombre;
       if (c.id === formVal) opt.selected = true;
       formSel.appendChild(opt);
     });
@@ -1389,7 +1380,7 @@
       allCategories.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
-        opt.textContent = (c.icono ? c.icono + ' ' : '') + c.nombre;
+        opt.textContent = c.nombre;
         bulkSel.appendChild(opt);
       });
     }
@@ -1794,7 +1785,6 @@
   function cancelCatEdit() {
     editingCatId = null;
     document.getElementById('cat-nombre').value = '';
-    document.getElementById('cat-icono').value = '';
     document.getElementById('cat-descripcion').value = '';
     document.getElementById('cat-img').value = '';
     document.getElementById('cat-img-preview').style.display = 'none';
@@ -1819,7 +1809,6 @@
     const cat = allCategories.find(c => c.id === id);
     if (!cat) return;
     editingCatId = id;
-    document.getElementById('cat-icono').value = cat.icono || '';
     document.getElementById('cat-nombre').value = cat.nombre || '';
     document.getElementById('cat-descripcion').value = cat.descripcion || '';
     document.getElementById('cat-img').value = '';
@@ -1846,7 +1835,7 @@
     wrap.innerHTML = allCategories.map(c => {
       const imgHtml = c.img
         ? `<img class="cat-card-img" src="${c.img}" alt="${escHtml(c.nombre)}" />`
-        : `<div class="cat-card-img-placeholder">${c.icono ? escHtml(c.icono) : '🏷️'}</div>`;
+        : `<div class="cat-card-img-placeholder"></div>`;
       const descHtml = c.descripcion
         ? `<div class="cat-card-desc">${escHtml(c.descripcion)}</div>`
         : '';
@@ -1854,7 +1843,7 @@
       <div class="cat-card">
         ${imgHtml}
         <div class="cat-card-info">
-          <div class="cat-card-title">${c.icono && !c.img ? '' : (c.icono ? escHtml(c.icono) + ' ' : '')}${escHtml(c.nombre)}</div>
+          <div class="cat-card-title">${escHtml(c.nombre)}</div>
           ${descHtml}
         </div>
         <div class="cat-card-actions">
@@ -1867,7 +1856,6 @@
 
   async function submitCategoryForm() {
     const nombre = document.getElementById('cat-nombre').value.trim();
-    const icono = document.getElementById('cat-icono').value.trim();
     const descripcion = document.getElementById('cat-descripcion').value.trim();
     const imgFile = document.getElementById('cat-img').files[0];
     if (!nombre) { document.getElementById('cat-nombre').focus(); return; }
@@ -1888,7 +1876,7 @@
         }
       }
 
-      const catData = { nombre, icono, descripcion };
+      const catData = { nombre, descripcion };
       if (imgUrl !== null) catData.img = imgUrl;
 
       if (editingCatId) {
@@ -2121,7 +2109,7 @@
   async function loadServicios() {
     const { data } = await supabaseClient
       .from('servicios')
-      .select('id, nombre, icono, orden')
+      .select('id, nombre, orden')
       .eq('activo', true)
       .order('orden');
     allServicios = data || [];
@@ -2138,7 +2126,7 @@
     panel.innerHTML = allServicios.map(s => `
       <label class="svc-opt">
         <input type="checkbox" value="${s.id}" data-nombre="${escHtml(s.nombre)}" onchange="updateServiciosSummary()">
-        ${s.icono ? escHtml(s.icono) + ' ' : ''}${escHtml(s.nombre)}
+        ${escHtml(s.nombre)}
       </label>`).join('');
   }
 
@@ -2155,7 +2143,7 @@
     try {
       const { data, error } = await supabaseClient
         .from('portafolio')
-        .select('*, portafolio_servicios(servicio_id, servicios(id, nombre, icono, orden))')
+        .select('*, portafolio_servicios(servicio_id, servicios(id, nombre, orden))')
         .order('created_at', { ascending: false });
       if (error) throw new Error('Error al cargar el portafolio: ' + error.message);
 
