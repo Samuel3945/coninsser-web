@@ -142,16 +142,19 @@
     const container = document.getElementById('pf-projects');
 
     try {
-      // Fetch all active projects — sort client-side so missing columns don't break the query
+      // Fetch active projects — also accept activo IS NULL for legacy records
       const { data: raw, error } = await supabaseClient
         .from('portafolio')
         .select('*')
-        .eq('activo', true)
+        .or('activo.eq.true,activo.is.null')
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(`Error ${error.code || ''}: ${error.message}`);
+      }
 
-      // Sort by orden (if column exists), nulls last
+      // Sort by orden client-side (nulls last)
       const projects = (raw || []).slice().sort((a, b) => {
         const ao = a.orden ?? null;
         const bo = b.orden ?? null;
@@ -163,8 +166,8 @@
 
       loading.style.display = 'none';
 
-      if (!projects || projects.length === 0) {
-        container.innerHTML = '<p style="text-align:center;color:#666;padding:40px 0;">No hay proyectos disponibles en este momento.</p>';
+      if (projects.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#666;padding:40px 0;">No hay proyectos publicados en este momento.</p>';
         return;
       }
 
@@ -215,7 +218,10 @@
 
     } catch (err) {
       loading.style.display = 'none';
-      container.innerHTML = '<p style="text-align:center;color:#666;padding:40px 0;">Error al cargar los proyectos. Por favor intente más tarde.</p>';
+      container.innerHTML = `<p style="text-align:center;color:#c00;padding:40px 0;font-size:0.9rem;">
+        Error al cargar proyectos: <strong>${err.message}</strong><br>
+        <small>Revisa la consola del navegador (F12) para más detalles.</small>
+      </p>`;
       console.error('Error cargando portafolio:', err);
     }
   }

@@ -2505,10 +2505,11 @@
       for (const file of Array.from(fileInput.files)) {
         const path = `proyectos/${Date.now()}_${file.name}`;
         const { error: uploadError } = await supabaseClient.storage.from(PF_BUCKET).upload(path, file);
-        if (!uploadError) {
-          const { data: urlData } = supabaseClient.storage.from(PF_BUCKET).getPublicUrl(path);
-          newUrls.push(urlData.publicUrl);
+        if (uploadError) {
+          throw new Error(`No se pudo subir la imagen "${file.name}": ${uploadError.message}. Verifica que el bucket "${PF_BUCKET}" exista y sea público en Supabase Storage.`);
         }
+        const { data: urlData } = supabaseClient.storage.from(PF_BUCKET).getPublicUrl(path);
+        newUrls.push(urlData.publicUrl);
       }
 
       const allImageUrls = [...remainingUrls, ...newUrls];
