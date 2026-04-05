@@ -167,8 +167,22 @@ async function msfSubmit() {
       archivos:     archivosUrls,
     };
 
-    // 3. Insertar lead en Supabase
-    const { error: insertError } = await supabaseClient.from('leads').insert(lead);
+    // 3. Insertar lead en Supabase via RPC (bypass RLS grants)
+    const { error: insertError } = await supabaseClient.rpc('submit_lead', {
+      p_nombre:        lead.nombre,
+      p_apellido:      lead.apellido,
+      p_empresa:       lead.empresa,
+      p_cargo:         lead.cargo,
+      p_email:         lead.email,
+      p_telefono:      lead.telefono,
+      p_ciudad:        lead.ciudad,
+      p_servicios:     lead.servicios,
+      p_presupuesto:   lead.presupuesto,
+      p_descripcion:   lead.descripcion,
+      p_plazo:         lead.plazo,
+      p_como_conocio:  lead.como_conocio,
+      p_archivos:      lead.archivos,
+    });
     if (insertError) throw new Error(insertError.message);
 
     // 4. Mostrar pantalla de éxito
