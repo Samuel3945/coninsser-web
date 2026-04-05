@@ -137,14 +137,12 @@ async function msfSubmit() {
           .from('adjuntos-leads')
           .upload(fileName, file, { upsert: false });
 
-        if (uploadError) throw new Error(`Error subiendo archivo: ${uploadError.message}`);
-
-        const { data: urlData } = supabaseClient.storage
-          .from('adjuntos-leads')
-          .getPublicUrl(fileName);
-
-        // El bucket es privado, usamos la ruta relativa para que el admin genere signed URL
-        archivosUrls.push(fileName);
+        if (uploadError) {
+          // Si falla la subida de archivos, continuamos sin ellos — el lead se guarda igual
+          console.warn('Archivo no pudo subirse (policy pendiente):', uploadError.message);
+        } else {
+          archivosUrls.push(fileName);
+        }
       }
     }
 
