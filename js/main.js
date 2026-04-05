@@ -117,12 +117,73 @@ function msfBack(fromStep) {
   msfGoTo(fromStep - 1);
 }
 
-function msfSubmit() {
+async function msfSubmit() {
   if (!msfValidate(3)) return;
-  // Hide all panels and show success
-  document.querySelectorAll('.msf__panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.msf__step').forEach(el => el.classList.add('done'));
-  document.getElementById('msf-success').classList.add('active');
+
+  const submitBtn = document.querySelector('.msf__btn-submit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
+
+  try {
+    // 1. Subir archivos adjuntos a Supabase Storage
+    const fileInput = document.getElementById('f-archivos');
+    const archivosUrls = [];
+
+    if (fileInput && fileInput.files.length > 0) {
+      for (const file of fileInput.files) {
+        const ext = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: uploadError } = await supabaseClient.storage
+          .from('adjuntos-leads')
+          .upload(fileName, file, { upsert: false });
+
+        if (uploadError) throw new Error(`Error subiendo archivo: ${uploadError.message}`);
+
+        const { data: urlData } = supabaseClient.storage
+          .from('adjuntos-leads')
+          .getPublicUrl(fileName);
+
+        // El bucket es privado, usamos la ruta relativa para que el admin genere signed URL
+        archivosUrls.push(fileName);
+      }
+    }
+
+    // 2. Recopilar datos del formulario
+    const serviciosChecked = Array.from(
+      document.querySelectorAll('input[name="servicio"]:checked')
+    ).map(el => el.value);
+
+    const lead = {
+      nombre:       document.getElementById('f-nombre').value.trim(),
+      apellido:     document.getElementById('f-apellido').value.trim(),
+      empresa:      document.getElementById('f-empresa').value.trim() || null,
+      cargo:        document.getElementById('f-cargo').value.trim() || null,
+      email:        document.getElementById('f-email').value.trim(),
+      telefono:     document.getElementById('f-telefono').value.trim(),
+      ciudad:       document.getElementById('f-ciudad').value.trim(),
+      servicios:    serviciosChecked,
+      presupuesto:  document.querySelector('input[name="presupuesto"]:checked')?.value || '',
+      descripcion:  document.getElementById('f-descripcion').value.trim(),
+      plazo:        document.getElementById('f-plazo').value || null,
+      como_conocio: document.getElementById('f-como').value || null,
+      archivos:     archivosUrls,
+    };
+
+    // 3. Insertar lead en Supabase
+    const { error: insertError } = await supabaseClient.from('leads').insert(lead);
+    if (insertError) throw new Error(insertError.message);
+
+    // 4. Mostrar pantalla de éxito
+    document.querySelectorAll('.msf__panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.msf__step').forEach(el => el.classList.add('done'));
+    document.getElementById('msf-success').classList.add('active');
+
+  } catch (err) {
+    console.error('Error enviando solicitud:', err);
+    alert('Ocurrió un error al enviar su solicitud. Por favor intente nuevamente o contáctenos por WhatsApp.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Enviar Solicitud';
+  }
 }
 
 function msfUpdateFile(input) {

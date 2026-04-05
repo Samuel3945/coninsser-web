@@ -8,7 +8,7 @@
   <script>
     const supabaseClient = supabase.createClient(
       'https://slsjaomaicjbrnzyxela.supabase.co',
-      'sb_publishable_zGd4ohnKJY7vcTmAf6kU1A__477ERHQ'
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsc2phb21haWNqYnJuenl4ZWxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMzg5MDMsImV4cCI6MjA5MDgxNDkwM30.V1uuBj6q72ShBPdRjtwVxLCuuo1C0ste-2EcMaJIkfk'
     );
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -909,6 +909,7 @@
     <div class="tab-bar">
       <button class="tab-btn active" data-tab="productos" onclick="switchTab('productos')">Productos</button>
       <button class="tab-btn" data-tab="portafolio" onclick="switchTab('portafolio')">Portafolio</button>
+      <button class="tab-btn" data-tab="leads" onclick="switchTab('leads')">Leads <span id="leads-badge" style="display:none;background:#c00;color:#fff;border-radius:999px;font-size:0.7rem;padding:1px 7px;margin-left:4px;font-weight:700;"></span></button>
     </div>
 
     <div id="section-productos">
@@ -1004,6 +1005,59 @@
 
       <div class="pagination" id="pf-pagination"></div>
     </div><!-- /section-portafolio -->
+
+    <!-- ══ SECCIÓN LEADS ══ -->
+    <div id="section-leads" style="display:none">
+      <div class="top-bar">
+        <h2>Leads de Contacto</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div class="filters">
+            <input type="text" id="leads-search" placeholder="Buscar por nombre, email o ciudad..." oninput="applyLeadsFilters()" />
+            <select id="leads-filter-estado" onchange="applyLeadsFilters()">
+              <option value="">Todos los estados</option>
+              <option value="nuevo">Nuevo</option>
+              <option value="visto">Visto</option>
+              <option value="atendido">Atendido</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="leads-table" style="display:none">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Ciudad</th>
+              <th>Presupuesto</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="leads-table-body"></tbody>
+        </table>
+        <div id="leads-table-state" class="state-msg" style="display:none">
+          <div class="spinner"></div>
+          <p>Cargando leads...</p>
+        </div>
+      </div>
+      <div class="pagination" id="leads-pagination"></div>
+    </div><!-- /section-leads -->
+
+    <!-- ══ MODAL DETALLE LEAD ══ -->
+    <div id="lead-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;overflow-y:auto;padding:32px 16px;">
+      <div style="background:#fff;max-width:640px;margin:0 auto;border-radius:4px;overflow:hidden;">
+        <div style="background:var(--primary);color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="font-family:var(--font-h);font-size:1.1rem;margin:0;">Detalle del Lead</h3>
+          <button onclick="closeLeadModal()" style="background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;line-height:1;">&#x2715;</button>
+        </div>
+        <div id="lead-modal-body" style="padding:24px;font-size:0.88rem;line-height:1.6;color:var(--text);">
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -2088,13 +2142,184 @@
   function switchTab(tab) {
     document.getElementById('section-productos').style.display  = tab === 'productos'  ? 'block' : 'none';
     document.getElementById('section-portafolio').style.display = tab === 'portafolio' ? 'block' : 'none';
+    document.getElementById('section-leads').style.display      = tab === 'leads'      ? 'block' : 'none';
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
     if (tab === 'portafolio' && !portfolioLoaded) {
       portfolioLoaded = true;
       loadServicios().then(() => loadPortfolio());
     }
+    if (tab === 'leads' && !leadsLoaded) {
+      leadsLoaded = true;
+      loadLeads();
+    }
   }
+
+  // ======== LEADS ========
+
+  let allLeads      = [];
+  let filteredLeads = [];
+  let leadsLoaded   = false;
+  let leadsPage     = 1;
+  const LEADS_PAGE_SIZE = 20;
+
+  function leadsState(type, msg) {
+    const table = document.getElementById('leads-table');
+    const state = document.getElementById('leads-table-state');
+    if (type === 'loading') {
+      table.style.display = 'none'; state.style.display = 'flex';
+      state.innerHTML = '<div class="spinner"></div><p>Cargando leads...</p>';
+    } else if (type === 'empty') {
+      table.style.display = 'none'; state.style.display = 'flex';
+      state.innerHTML = '<div class="icon">📭</div><p>No hay leads registrados.</p>';
+    } else if (type === 'error') {
+      table.style.display = 'none'; state.style.display = 'flex';
+      state.innerHTML = `<div class="icon">⚠️</div><p>${escHtml(msg || 'Error al cargar.')}</p>`;
+    } else {
+      state.style.display = 'none'; table.style.display = 'table';
+    }
+  }
+
+  async function loadLeads() {
+    leadsState('loading');
+    try {
+      const { data, error } = await supabaseClient
+        .from('leads')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw new Error(error.message);
+      allLeads = data || [];
+      // badge de leads nuevos
+      const nuevos = allLeads.filter(l => l.estado === 'nuevo').length;
+      const badge = document.getElementById('leads-badge');
+      if (nuevos > 0) { badge.textContent = nuevos; badge.style.display = 'inline'; }
+      else { badge.style.display = 'none'; }
+      applyLeadsFilters();
+    } catch (err) {
+      leadsState('error', err.message);
+    }
+  }
+
+  function applyLeadsFilters() {
+    const q      = (document.getElementById('leads-search')?.value || '').toLowerCase();
+    const estado = document.getElementById('leads-filter-estado')?.value || '';
+    filteredLeads = allLeads.filter(l => {
+      const matchQ = !q || [l.nombre, l.apellido, l.email, l.ciudad, l.empresa]
+        .some(v => (v || '').toLowerCase().includes(q));
+      const matchE = !estado || l.estado === estado;
+      return matchQ && matchE;
+    });
+    leadsPage = 1;
+    renderLeads();
+  }
+
+  function renderLeads() {
+    const tbody = document.getElementById('leads-table-body');
+    const pgEl  = document.getElementById('leads-pagination');
+    if (filteredLeads.length === 0) { leadsState('empty'); pgEl.innerHTML = ''; return; }
+    leadsState('show');
+    const pages = Math.ceil(filteredLeads.length / LEADS_PAGE_SIZE);
+    const page  = filteredLeads.slice((leadsPage - 1) * LEADS_PAGE_SIZE, leadsPage * LEADS_PAGE_SIZE);
+
+    const estadoColor = { nuevo: '#c00', visto: '#d97706', atendido: '#166534' };
+    tbody.innerHTML = page.map(l => {
+      const fecha = new Date(l.created_at).toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+      const color = estadoColor[l.estado] || '#666';
+      return `<tr>
+        <td style="white-space:nowrap;font-size:0.78rem;">${fecha}</td>
+        <td><strong>${escHtml(l.nombre)} ${escHtml(l.apellido)}</strong>${l.empresa ? `<br><span style="font-size:0.76rem;color:var(--text-muted)">${escHtml(l.empresa)}</span>` : ''}</td>
+        <td><a href="mailto:${escHtml(l.email)}" style="color:var(--secondary)">${escHtml(l.email)}</a></td>
+        <td><a href="tel:${escHtml(l.telefono)}">${escHtml(l.telefono)}</a></td>
+        <td>${escHtml(l.ciudad)}</td>
+        <td style="font-size:0.8rem;">${escHtml(l.presupuesto)}</td>
+        <td>
+          <select onchange="changeLeadEstado('${l.id}', this.value)" style="font-size:0.78rem;border:1px solid #ddd;border-radius:3px;padding:3px 6px;color:${color};font-weight:600;">
+            <option value="nuevo"    ${l.estado==='nuevo'    ?'selected':''} style="color:#c00">Nuevo</option>
+            <option value="visto"    ${l.estado==='visto'    ?'selected':''} style="color:#d97706">Visto</option>
+            <option value="atendido" ${l.estado==='atendido' ?'selected':''} style="color:#166534">Atendido</option>
+          </select>
+        </td>
+        <td><button class="btn btn-edit" onclick="openLeadModal('${l.id}')">Ver detalle</button></td>
+      </tr>`;
+    }).join('');
+
+    // Paginación
+    if (pages <= 1) { pgEl.innerHTML = ''; return; }
+    let html = '';
+    for (let i = 1; i <= pages; i++) {
+      html += `<button class="page-btn${i === leadsPage ? ' active' : ''}" onclick="leadsPage=${i};renderLeads()">${i}</button>`;
+    }
+    pgEl.innerHTML = html;
+  }
+
+  async function changeLeadEstado(id, estado) {
+    const { error } = await supabaseClient.from('leads').update({ estado }).eq('id', id);
+    if (error) { alert('Error actualizando estado: ' + error.message); return; }
+    const lead = allLeads.find(l => l.id === id);
+    if (lead) lead.estado = estado;
+    // actualizar badge
+    const nuevos = allLeads.filter(l => l.estado === 'nuevo').length;
+    const badge = document.getElementById('leads-badge');
+    if (nuevos > 0) { badge.textContent = nuevos; badge.style.display = 'inline'; }
+    else { badge.style.display = 'none'; }
+  }
+
+  async function openLeadModal(id) {
+    const l = allLeads.find(x => x.id === id);
+    if (!l) return;
+
+    // Marcar como visto si era nuevo
+    if (l.estado === 'nuevo') {
+      await changeLeadEstado(id, 'visto');
+      const sel = document.querySelector(`select[onchange="changeLeadEstado('${id}', this.value)"]`);
+      if (sel) sel.value = 'visto';
+    }
+
+    // Generar signed URLs para archivos
+    let archivosHtml = '<em style="color:var(--text-muted)">Sin archivos adjuntos</em>';
+    if (l.archivos && l.archivos.length > 0) {
+      const links = await Promise.all(l.archivos.map(async (path) => {
+        const { data, error } = await supabaseClient.storage
+          .from('adjuntos-leads')
+          .createSignedUrl(path, 3600);
+        if (error || !data?.signedUrl) return `<span style="color:#c00">Error: ${escHtml(path)}</span>`;
+        const name = path.split('/').pop().replace(/^\d+-[a-z0-9]+\./, 'archivo.');
+        return `<a href="${data.signedUrl}" target="_blank" style="color:var(--secondary);text-decoration:underline;">📎 ${escHtml(name)}</a>`;
+      }));
+      archivosHtml = links.join('<br>');
+    }
+
+    const fecha = new Date(l.created_at).toLocaleString('es-CO');
+    document.getElementById('lead-modal-body').innerHTML = `
+      <div style="display:grid;gap:14px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Nombre</p><p>${escHtml(l.nombre)} ${escHtml(l.apellido)}</p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Fecha</p><p>${fecha}</p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Empresa</p><p>${escHtml(l.empresa || '—')}</p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Cargo</p><p>${escHtml(l.cargo || '—')}</p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Email</p><p><a href="mailto:${escHtml(l.email)}" style="color:var(--secondary)">${escHtml(l.email)}</a></p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Teléfono</p><p><a href="tel:${escHtml(l.telefono)}">${escHtml(l.telefono)}</a></p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Ciudad</p><p>${escHtml(l.ciudad)}</p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Presupuesto</p><p>${escHtml(l.presupuesto)}</p></div>
+        </div>
+        <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Servicios de interés</p><p>${(l.servicios || []).map(s => `<span style="display:inline-block;background:#e8eaf6;color:var(--primary);border-radius:3px;padding:2px 8px;font-size:0.78rem;margin:2px;">${escHtml(s)}</span>`).join(' ')}</p></div>
+        <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Descripción del proyecto</p><p style="background:#f5f5f5;padding:10px 12px;border-radius:4px;white-space:pre-wrap;">${escHtml(l.descripcion)}</p></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Plazo</p><p>${escHtml(l.plazo || '—')}</p></div>
+          <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">¿Cómo nos conoció?</p><p>${escHtml(l.como_conocio || '—')}</p></div>
+        </div>
+        <div><p style="font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Archivos adjuntos</p>${archivosHtml}</div>
+      </div>`;
+    document.getElementById('lead-modal-overlay').style.display = 'block';
+  }
+
+  function closeLeadModal() {
+    document.getElementById('lead-modal-overlay').style.display = 'none';
+  }
+
+  document.getElementById('lead-modal-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('lead-modal-overlay')) closeLeadModal();
+  });
 
   // ======== PORTAFOLIO ========
 
